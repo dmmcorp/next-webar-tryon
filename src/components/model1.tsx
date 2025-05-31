@@ -8,38 +8,53 @@ export default function Model1({ landmarks }: { landmarks: Landmarks | null }) {
   const ref = useRef<THREE.Object3D>(null);
 
   useEffect(() => {
-    if (landmarks && ref.current) {
-      const leftEye = landmarks.getLeftEye();
-      const rightEye = landmarks.getRightEye();
+    if (landmarks && ref.current && landmarks.faceMetrics) {
+      const {
+        eyeDistance,
+        eyeSlope,
+        faceDepth,
+        displaySize,
+        noseBridge,
+        faceWidth,
+        faceHeight,
+        faceCenterX,
+        faceCenterY,
+      } = landmarks.faceMetrics;
 
-      // Calculate center point between eyes
-      const centerX = (leftEye[0].x + rightEye[0].x) / 2;
-      const centerY = (leftEye[0].y + rightEye[0].y) / 2;
+      // Normalize coordinates based on display size
+      // const normalizedX = (faceCenterX / displaySize.width) * 2 - 1.3;
+      // const normalizedY = (faceCenterY / displaySize.height) * 2 - 1;
 
-      // Calculate rotation based on eye positions
-      const eyeAngle = Math.atan2(
-        rightEye[0].y - leftEye[0].y,
-        rightEye[0].x - leftEye[0].x
-      );
+      const normalizedX = -((faceCenterX / displaySize.width) * 2 - 1.5); // flipped
+      const normalizedY = -((faceCenterY / displaySize.height) * 2 - 1) + -0.9; // Added offset to move up
 
-      // Calculate scale based on eye distance
-      const eyeDistance = Math.sqrt(
-        Math.pow(rightEye[0].x - leftEye[0].x, 2.2) +
-          Math.pow(rightEye[0].y - leftEye[0].y, 2.2)
-      );
-      const scale = eyeDistance * 0.01; // Pag experiment-an ang value SIZE
+      // Dynamic scale based on face size
+      // const scale = eyeDistance * 0.004 * (displaySize.width / 320); // Base scale adjusted for screen size
 
-      // model position and rotation
-      ref.current.position.set(
-        ((centerX / landmarks.imageWidth) * 2 - 1) * -1, // Invert X position
-        -((centerY / landmarks.imageHeight) * 2 - 1), // Adjust Y position
-        -0.5 // Move model closer to camera
-      );
+      const scale = eyeDistance / 80;
 
-      ref.current.rotation.x = Math.PI * 0.1; // Tilt forward/backward
-      ref.current.rotation.y = 0; // Left/right rotation
-      ref.current.rotation.z = eyeAngle; // Keep the existing z rotation
-      ref.current.scale.setScalar(scale);
+      // Dynamic depth based on face position
+      const zPosition = -0.5;
+
+      // Dynamic rotation based on face angle
+      const xRotation =
+        Math.PI * 0.1 +
+        ((noseBridge[3].y - noseBridge[0].y) / faceHeight) * Math.PI * 0.2;
+      const yRotation = (normalizedX * Math.PI) / 8; // Slight rotation based on face position
+      const zRotation = -eyeSlope; // Counter-rotate to match face tilt
+
+      // Update model transform
+      ref.current.position.set(normalizedX, normalizedY, zPosition);
+      ref.current.rotation.set(xRotation, yRotation, zRotation);
+      ref.current.scale.set(scale, scale, scale);
+
+      // dynamic for testing
+      // ref.current.position.set(0, -0.3, -0.5);
+      // ref.current.scale.set(
+      //   0.3885406584744767,
+      //   0.3885406584744767,
+      //   0.3885406584744767
+      // );
     }
   }, [landmarks]);
 
@@ -49,7 +64,7 @@ export default function Model1({ landmarks }: { landmarks: Landmarks | null }) {
       object={scene}
       position={[0, 0, -0.5]}
       rotation={[0, 0, 0]}
-      scale={0.1} // Try a smaller initial scale
+      scale={0.1}
     />
   );
 }

@@ -23,12 +23,18 @@ export default function FaceDetectionComponent() {
     <div className="relative h-dvh w-full ">
       <FaceDetection onLandmarks={setLandmarks} />
       {/* 3D Overlay Layer */}
-      <div className="absolute bg-transparent size-full top-0 ">
-        <Canvas camera={{ position: [0, 0, 2], fov: 75 }} className="absolute">
+      <div className="absolute bg-transparent size-full top-0 left-0">
+        <Canvas
+          camera={{ zoom: 100, position: [0, 0, 100] }}
+          gl={{ antialias: true }}
+          className="absolute"
+          orthographic
+        >
           <ambientLight intensity={0.5} />
           <directionalLight position={[0, 0, 5]} />
-          <OrbitControls />
+          {/* <OrbitControls /> */}
           <Model1 landmarks={landmarks} />
+          <axesHelper args={[5]} />
         </Canvas>
       </div>
     </div>

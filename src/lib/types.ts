@@ -1,6 +1,21 @@
-import { Box, FaceDetection, FaceLandmarks, IBoundingBox, IRect, Point } from "@vladmandic/face-api";
+import { Box, FaceDetection, FaceLandmarks, IBoundingBox, IRect, Point, FaceLandmarks68 } from "@vladmandic/face-api";
 
-export type Landmarks = {
+export interface FaceMetrics {
+    eyeDistance: number;
+    eyeSlope: number;
+    faceDepth: number;
+    displaySize: {
+        width: number;
+        height: number;
+    };
+    noseBridge: Point[];
+    faceWidth: number;
+    faceHeight: number;
+    faceCenterX: number;
+    faceCenterY: number;
+}
+
+export interface Landmarks extends FaceLandmarks68 {
     getJawOutline: () => Point[];
     getLeftEyeBrow: () => Point[];
     getRightEyeBrow: () => Point[];
@@ -20,4 +35,5 @@ export type Landmarks = {
         useDlibAlignment?: boolean | undefined;
         minBoxPadding?: number | undefined;
     } | undefined) => Box<any>;
+    faceMetrics?: FaceMetrics;
 }
