@@ -1,132 +1,121 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client'
 import React, { useEffect, useRef, useState } from 'react';
+import { Landmarks } from '@/lib/types';
 
-import Image from 'next/image';
-
-interface FaceAPI {
-    nets: any;
-    fetchImage: any;
-    detectSingleFace: any;
-    LabeledFaceDescriptors: any;
-    FaceMatcher: any;
-  }
-
-// Add a flag to track TF initialization
-
-export default function FaceDetectionComponent() {
-  const [faceapi, setFaceapi] = useState<FaceAPI | null>(null);
+export default function FaceDetection({
+  onLandmarks = () => {},
+}: {
+  onLandmarks: (landmark: Landmarks | null) => void;
+}) {
+  const [faceapi, setFaceapi] = useState<typeof import('@vladmandic/face-api') | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [openVideo, setOpenVideo] = useState<boolean>(false);
-
-//   const [detectedFace, setDetectedFace] = useState<Employee | undefined>(undefined)
   const [isDetecting, setIsDetecting] = useState<string>("")
   const [error, setError] = useState<string | null>(null);
-  const [currentTime, setCurrentTime] = useState<Date>();
 
   useEffect(() => {
-      console.log("devices",navigator.mediaDevices)
-    async function enableCamera() {
+    async function loadLibraries() {
       try {
-     
-      
-           const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (err) {
-        console.error('Error accessing camera:', err);
+        const faceapiModule = await import('@vladmandic/face-api');
+        setFaceapi(faceapiModule);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error loading libraries:', error);
+        setIsDetecting("Error loading required libraries");
       }
     }
 
-    enableCamera();
+    loadLibraries();
 
+    // Cleanup function
     return () => {
-      // Stop the camera on component unmount
-      if (videoRef.current?.srcObject) {
-        (videoRef.current.srcObject as MediaStream)
-          .getTracks()
-          .forEach((track) => track.stop());
-      }
+      // Optional: Add any cleanup needed for face-api
     };
   }, []);
-  // useEffect(() => {
-  //   async function loadLibraries() {
-  //     try {
-       
-  //       const faceapiModule = await import('@vladmandic/face-api');
-  //       console.log(faceapi)
-  //       setFaceapi(faceapiModule);
-  //       setIsLoading(false);
-  //     } catch (error) {
-  //       console.error('Error loading libraries:', error);
-  //       setIsDetecting("Error loading required libraries");
-  //     }
-  //   }
 
-  //   loadLibraries();
+  useEffect(() => {
+    if (!faceapi) return;
 
-  //   // Cleanup function
-  //   return () => {
-  //     // Optional: Add any cleanup needed for face-api
-  //   };
-  // }, []);
+    async function loadModels() {
+      try {
+        const modelPath = '/models';
+        await Promise.all([
+          faceapi?.nets.ssdMobilenetv1.loadFromUri(modelPath),
+          faceapi?.nets.tinyFaceDetector.loadFromUri(modelPath),
+          faceapi?.nets.faceLandmark68Net.loadFromUri(modelPath),
+          faceapi?.nets.faceRecognitionNet.loadFromUri(modelPath),
+        ]);
+      } catch (error) {
+        console.error('Error loading models:', error);
+        setIsDetecting("Error loading face detection models");
+      }
+    }
 
-  // useEffect(() => {
-  //   // if (!faceapi) return;
+    loadModels();
 
-  //   // async function loadModels() {
-  //   //   try {
-  //   //     const modelPath = '/models';
-  //   //     await Promise.all([
-  //   //       faceapi?.nets.ssdMobilenetv1.loadFromUri(modelPath),
-  //   //       faceapi?.nets.tinyFaceDetector.loadFromUri(modelPath),
-  //   //       faceapi?.nets.faceLandmark68Net.loadFromUri(modelPath),
-  //   //       faceapi?.nets.faceRecognitionNet.loadFromUri(modelPath),
-  //   //     ]);
-  //   //   } catch (error) {
-  //   //     console.error('Error loading models:', error);
-  //   //     setIsDetecting("Error loading face detection models");
-  //   //   }
-  //   // }
-
-  //   // loadModels();
-
-  //   setOpenVideo(true)
-  //   // startVideo()
+    setOpenVideo(true)
+    startVideo()
     
-  // }, []);
+  }, [faceapi]);
 
  
 
-  // const startVideo = async () => {
-  //   if (videoRef.current) {
-  //     try {
-  //       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-  //       videoRef.current.srcObject = stream;
-  //     } catch (error) {
-  //       console.error('Error accessing webcam:', error);
-  //     }
-  //   }
-  // }
-
-  // const detectFace = async () => {
-  //   if (!faceapi || !videoRef.current) return;
-  //   setIsDetecting("Recognizing...")
-  //   setError(null)
-  //   // setDetectedFace(undefined)
-   
-  //   if (videoRef.current) {
-  //     const video = videoRef.current;
-  //     const result = await faceapi.detectSingleFace(video)
-  //       .withFaceLandmarks()
-  //       .withFaceDescriptor();
-
-  //   }
-  // }
+  const startVideo = async () => {
+    if (videoRef.current) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoRef.current.srcObject = stream;
+    
+      } catch (error) {
+        console.error('Error accessing webcam:', error);
+      }
+    }
+  }
+ 
+  useEffect(() => {
+    let animationId: number;
+  
+    const runDetection = async () => {
+      if (!faceapi || !videoRef.current || videoRef.current.readyState !== 4) {
+        animationId = requestAnimationFrame(runDetection);
+        return;
+      }
+  
+      try {
+        const result = await faceapi.detectSingleFace(
+          videoRef.current,
+          new faceapi.TinyFaceDetectorOptions()
+        ).withFaceLandmarks().withFaceDescriptor();
+  
+        if (result) {
+          // console.log("Face detected:", result);
+          setIsDetecting("Face detected");
+          onLandmarks(result.landmarks)
+        } else {
+          setIsDetecting("No face");
+        }
+      } catch (err) {
+        console.error("Detection error:", err);
+        setError("Detection error");
+      }
+  
+      animationId = requestAnimationFrame(runDetection);
+    };
+  
+    if (faceapi && openVideo) {
+      runDetection();
+    }
+  
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, [faceapi, openVideo]);
+  
+ 
 
   // Clean up timeout when component unmounts
 
@@ -148,20 +137,21 @@ export default function FaceDetectionComponent() {
   // }
 
   return (
-    <div className="h-1/2 w-1/2 bg-black">
+    <div className="size-full ">
+      {isDetecting}
     <video
-      width="240"
-      height="360"
-    
+      id='video'
+      ref={videoRef}
+      style={{transform: 'scaleX(-1)'}}
+      className='size-full object-cover'
       autoPlay
       muted
-      loop
-    
-      style={{ borderRadius: "8px", maxWidth: "100%" }}
-    >
+      playsInline
      
+    >
       Your browser does not support the video tag.
     </video>
+    {/* <button onClick={detectFace} >Click me</button> */}
     </div>
   );
 }
