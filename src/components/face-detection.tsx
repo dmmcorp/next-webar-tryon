@@ -84,36 +84,65 @@ export default function FaceDetection({
       }
 
       try {
-
-        
-        const displaySize = { width: videoRef.current.videoWidth, height: videoRef.current.videoHeight }
-   
-       
+        const displaySize = {
+          width: videoRef.current.offsetWidth,
+          height: videoRef.current.offsetHeight,
+        };
 
         const result = await faceapi
           .detectSingleFace(
             videoRef.current,
-            new faceapi.TinyFaceDetectorOptions()
+            new faceapi.TinyFaceDetectorOptions({
+              inputSize: 320,
+              scoreThreshold: 0.5,
+            })
           )
           .withFaceLandmarks()
           .withFaceDescriptor();
 
         if (result) {
           // console.log("Face detected:", result);
+
+          const landmarks = result.landmarks;
+          const leftEye = landmarks.getLeftEye();
+          const rightEye = landmarks.getRightEye();
+          const nose = landmarks.getNose();
+
+          const faceDepth =
+            Math.abs((leftEye[0].y + rightEye[0].y) / 2 - nose[0].y) /
+            result.detection.box.height;
+
+          const eyeSlope = Math.atan2(
+            rightEye[0].y - leftEye[0].y,
+            rightEye[0].x - leftEye[0].x
+          );
+
+          const eyeDistance = Math.sqrt(
+            Math.pow(rightEye[0].x - leftEye[0].x, 2) +
+              Math.pow(rightEye[0].y - leftEye[0].y, 2)
+          );
+
+          const enhancedLandmarks = {
+            ...result.landmarks,
+            imageWidth: displaySize.width,
+            imageHeight: displaySize.height,
+            faceMetrics: {
+              eyeDistance,
+              eyeSlope,
+              faceDepth,
+              displaySize,
+              noseBridge: nose,
+              faceWidth: result.detection.box.width,
+              faceHeight: result.detection.box.height,
+              faceCenterX:
+                result.detection.box.x + result.detection.box.width / 2,
+              faceCenterY:
+                result.detection.box.y + result.detection.box.height / 2,
+            },
+          } as Landmarks;
+
           setIsDetecting("Face detected");
-          if(canvasRef.current) {
-            const canvas = canvasRef.current;
-            canvas.width = displaySize.width;
-            canvas.height = displaySize.height;
-            faceapi.matchDimensions(canvas, displaySize)
-            const resizedResults = faceapi.resizeResults(result, displaySize)
-            // draw detections into the canvas
-            faceapi.draw.drawDetections(canvas, resizedResults)
-            // draw the landmarks into the canvas
-            faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
-          }
-         
-          onLandmarks(result.landmarks);
+          onLandmarks(enhancedLandmarks);
         } else {
           setIsDetecting("No face");
         }
@@ -138,7 +167,7 @@ export default function FaceDetection({
 
 
   return (
-    <div className="size-full relative">
+    <div className="size-full">
       {isDetecting}
       <video
         id="video"
