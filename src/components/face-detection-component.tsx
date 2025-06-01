@@ -25,7 +25,7 @@ export default function FaceDetectionComponent() {
   return (
     <div className="relative h-dvh w-full ">
       <FaceDetection onLandmarks={setLandmarks} />
-      {/* 3D Overlay Layer */}
+      {/* 3D Overlays */}
       <div className="absolute bg-transparent size-full top-0 left-0">
         <Canvas
           camera={{ zoom: 100, position: [0, 0, 100] }}
