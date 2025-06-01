@@ -10,11 +10,12 @@ export default function FaceDetection({
   const [faceapi, setFaceapi] = useState<
     typeof import("@vladmandic/face-api") | null
   >(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [openVideo, setOpenVideo] = useState<boolean>(false);
   const [isDetecting, setIsDetecting] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadLibraries() {
@@ -29,7 +30,6 @@ export default function FaceDetection({
     }
 
     loadLibraries();
-
     // Cleanup function
     return () => {
       // Optional: Add any cleanup needed for face-api
@@ -67,6 +67,7 @@ export default function FaceDetection({
           video: true,
         });
         videoRef.current.srcObject = stream;
+
       } catch (error) {
         console.error("Error accessing webcam:", error);
       }
@@ -77,12 +78,18 @@ export default function FaceDetection({
     let animationId: number;
 
     const runDetection = async () => {
-      if (!faceapi || !videoRef.current || videoRef.current.readyState !== 4) {
+      if (!faceapi || !videoRef.current || videoRef.current.readyState !== 4)  {
         animationId = requestAnimationFrame(runDetection);
         return;
       }
 
       try {
+
+        
+        const displaySize = { width: videoRef.current.videoWidth, height: videoRef.current.videoHeight }
+   
+       
+
         const result = await faceapi
           .detectSingleFace(
             videoRef.current,
@@ -94,6 +101,18 @@ export default function FaceDetection({
         if (result) {
           // console.log("Face detected:", result);
           setIsDetecting("Face detected");
+          if(canvasRef.current) {
+            const canvas = canvasRef.current;
+            canvas.width = displaySize.width;
+            canvas.height = displaySize.height;
+            faceapi.matchDimensions(canvas, displaySize)
+            const resizedResults = faceapi.resizeResults(result, displaySize)
+            // draw detections into the canvas
+            faceapi.draw.drawDetections(canvas, resizedResults)
+            // draw the landmarks into the canvas
+            faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
+          }
+         
           onLandmarks(result.landmarks);
         } else {
           setIsDetecting("No face");
@@ -115,39 +134,30 @@ export default function FaceDetection({
         cancelAnimationFrame(animationId);
       }
     };
-  }, [faceapi, openVideo]);
+  }, [faceapi, openVideo, onLandmarks]);
 
-  // Clean up timeout when component unmounts
-
-  // Add this new function to stop the video stream
-  const stopVideo = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach((track) => track.stop());
-      videoRef.current.srcObject = null;
-    }
-    setOpenVideo(false);
-    setIsDetecting("");
-  };
-
-  // if (isLoading) {
-  //   return <div>Loading face detection libraries...</div>;
-  // }
 
   return (
-    <div className="size-full ">
+    <div className="size-full relative">
       {isDetecting}
       <video
         id="video"
         ref={videoRef}
-        style={{ transform: "scaleX(-1)" }}
-        className="size-full object-cover"
+   
+        className="size-full absolute inset-0 bg-red-600/30 object-cover"
         autoPlay
         muted
         playsInline
       >
         Your browser does not support the video tag.
       </video>
+
+      <canvas
+        ref={canvasRef}
+        id="overlay"
+       
+        className="absolute inset-0 size-full  object-cover"
+      />
       {/* <button onClick={detectFace} >Click me</button> */}
     </div>
   );

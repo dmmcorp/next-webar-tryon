@@ -21,3 +21,32 @@ export type Landmarks = {
         minBoxPadding?: number | undefined;
     } | undefined) => Box<any>;
 }
+
+
+export type DetectionBox = {
+    x: number
+    y: number
+    width: number
+    height: number
+  }
+  
+  export type ExpressionMap = Record<string, number>
+  
+  export type LandmarkPoint = {
+    x: number
+    y: number
+  }
+  
+  export type Person = {
+    detection: {
+      box: DetectionBox
+    }
+    angle: {
+      roll: number
+      pitch: number
+      yaw: number
+    }
+    landmarks: {
+      positions: LandmarkPoint[]
+    }
+  }

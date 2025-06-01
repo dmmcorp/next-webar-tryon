@@ -17,8 +17,9 @@ const FaceDetection = dynamic<FaceDetectionProps>(
 );
 
 export default function FaceDetectionComponent() {
-  const [landmarks, setLandmarks] = useState<Landmarks | null>(null);
   // console.log(landmarks);
+  const [landmarks, setLandmarks] = useState<Landmarks | null>(null);
+  const [faceDetected, setFaceDetected] = useState<boolean>(null);
   return (
     <div className="relative h-dvh w-full ">
       <FaceDetection onLandmarks={setLandmarks} />
