@@ -84,10 +84,11 @@ export default function FaceDetection({
       }
 
       try {
-        const displaySize = {
-          width: videoRef.current.offsetWidth,
-          height: videoRef.current.offsetHeight,
-        };
+
+        
+        const displaySize = { width: videoRef.current.videoWidth, height: videoRef.current.videoHeight }
+   
+       
 
         const result = await faceapi
           .detectSingleFace(
@@ -140,8 +141,19 @@ export default function FaceDetection({
                 result.detection.box.y + result.detection.box.height / 2,
             },
           } as Landmarks;
-
           setIsDetecting("Face detected");
+          if(canvasRef.current) {
+            const canvas = canvasRef.current;
+            canvas.width = displaySize.width;
+            canvas.height = displaySize.height;
+            faceapi.matchDimensions(canvas, displaySize)
+            const resizedResults = faceapi.resizeResults(result, displaySize)
+            // draw detections into the canvas
+            faceapi.draw.drawDetections(canvas, resizedResults)
+            // draw the landmarks into the canvas
+            faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
+          }
+         
           onLandmarks(enhancedLandmarks);
         } else {
           setIsDetecting("No face");
@@ -167,12 +179,12 @@ export default function FaceDetection({
 
 
   return (
-    <div className="size-full">
+    <div className="size-full relative">
       {isDetecting}
       <video
         id="video"
         ref={videoRef}
-   
+
         className="size-full absolute inset-0 bg-red-600/30 object-cover"
         autoPlay
         muted

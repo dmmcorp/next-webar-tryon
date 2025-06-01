@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Landmarks } from "@/lib/types";
 import dynamic from "next/dynamic";
 import { Canvas } from "@react-three/fiber";
-import Sunglasses from "./sunglasses";
-import { OrbitControls } from "@react-three/drei";
+// import Sunglasses from "./sunglasses";
+// import { OrbitControls } from "@react-three/drei";
 import Model1 from "./model1";
 
 type FaceDetectionProps = {
@@ -19,7 +19,7 @@ const FaceDetection = dynamic<FaceDetectionProps>(
 export default function FaceDetectionComponent() {
   // console.log(landmarks);
   const [landmarks, setLandmarks] = useState<Landmarks | null>(null);
-  const [faceDetected, setFaceDetected] = useState<boolean>(null);
+  // const [faceDetected, setFaceDetected] = useState<boolean>(null);
   return (
     <div className="relative h-dvh w-full ">
       <FaceDetection onLandmarks={setLandmarks} />

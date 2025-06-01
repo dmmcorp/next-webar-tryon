@@ -34,7 +34,7 @@ export interface Landmarks extends FaceLandmarks68 {
     align: (detection?: FaceDetection | IRect | IBoundingBox | null | undefined, options?: {
         useDlibAlignment?: boolean | undefined;
         minBoxPadding?: number | undefined;
-    } | undefined) => Box<any>;
+    } | undefined) => Box<unknown>;
     faceMetrics?: FaceMetrics;
 }
 

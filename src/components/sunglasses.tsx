@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import { Landmarks } from "@/lib/types";
 import { useGLTF } from "@react-three/drei";
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 
 export default function Sunglasses({
-  landmarks,
+  // landmarks,
 }: {
   landmarks: Landmarks | null;
 }) {

@@ -12,10 +12,10 @@ export default function Model1({ landmarks }: { landmarks: Landmarks | null }) {
       const {
         eyeDistance,
         eyeSlope,
-        faceDepth,
+        // faceDepth,
         displaySize,
         noseBridge,
-        faceWidth,
+        // faceWidth,
         faceHeight,
         faceCenterX,
         faceCenterY,
