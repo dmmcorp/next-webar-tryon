@@ -5,7 +5,8 @@ import dynamic from "next/dynamic";
 import { Canvas } from "@react-three/fiber";
 // import Sunglasses from "./sunglasses";
 // import { OrbitControls } from "@react-three/drei";
-import Model1 from "./model1";
+import DynamicModel from "./dynamic-model";
+import ModelSelector from "./model-selector";
 
 type FaceDetectionProps = {
   onLandmarks: (landmarks: Landmarks | null) => void;
@@ -19,6 +20,7 @@ const FaceDetection = dynamic<FaceDetectionProps>(
 export default function FaceDetectionComponent() {
   // console.log(landmarks);
   const [landmarks, setLandmarks] = useState<Landmarks | null>(null);
+  const [selectedModel, setSelectedModel] = useState(1);
   // const [faceDetected, setFaceDetected] = useState<boolean>(null);
   return (
     <div className="relative h-dvh w-full ">
@@ -34,10 +36,11 @@ export default function FaceDetectionComponent() {
           <ambientLight intensity={0.5} />
           <directionalLight position={[0, 0, 5]} />
           {/* <OrbitControls /> */}
-          <Model1 landmarks={landmarks} />
+          <DynamicModel landmarks={landmarks} modelNumber={selectedModel} />
           <axesHelper args={[5]} />
         </Canvas>
       </div>
+      <ModelSelector onModelChange={setSelectedModel} />
     </div>
   );
 }

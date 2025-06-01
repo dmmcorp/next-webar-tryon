@@ -21,27 +21,52 @@ export default function Model1({ landmarks }: { landmarks: Landmarks | null }) {
         faceCenterY,
       } = landmarks.faceMetrics;
 
+      // Debug logging
+
+      console.log("Face Metrics:", {
+        displaySize,
+        eyeDistance,
+        faceCenterX,
+        faceCenterY,
+        eyeSlope: eyeSlope * (180 / Math.PI),
+      });
+
       // Normalize coordinates based on display size
       // const normalizedX = (faceCenterX / displaySize.width) * 2 - 1.3;
       // const normalizedY = (faceCenterY / displaySize.height) * 2 - 1;
 
-      const normalizedX = -((faceCenterX / displaySize.width) * 2 - 1.5); // flipped
-      const normalizedY = -((faceCenterY / displaySize.height) * 2 - 1) + -0.9; // Added offset to move up
+      const normalizedX = -((faceCenterX / displaySize.width) * 2 - 0.8); // Removed 1.5 offset
+      const normalizedY = -((faceCenterY / displaySize.height) * 2 - 1) - 0.7; // Adjusted vertical offset
+
+      console.log("Normalized Positions:", {
+        normalizedX,
+        normalizedY,
+        scale: eyeDistance / 80,
+      });
 
       // Dynamic scale based on face size
       // const scale = eyeDistance * 0.004 * (displaySize.width / 320); // Base scale adjusted for screen size
 
       const scale = eyeDistance / 80;
-
       // Dynamic depth based on face position
-      const zPosition = -0.5;
+      const zPosition = -0.3;
 
       // Dynamic rotation based on face angle
       const xRotation =
-        Math.PI * 0.1 +
-        ((noseBridge[3].y - noseBridge[0].y) / faceHeight) * Math.PI * 0.2;
-      const yRotation = (normalizedX * Math.PI) / 8; // Slight rotation based on face position
-      const zRotation = -eyeSlope; // Counter-rotate to match face tilt
+        Math.PI * 0.05 +
+        ((noseBridge[3].y - noseBridge[0].y) / faceHeight) * Math.PI * 0.15;
+      const yRotation = (normalizedX * Math.PI) / 12; // Reduced rotation factor
+      const zRotation = -eyeSlope * 0.8; // Slightly reduced tilt adjustment
+
+      console.log("Final Transforms:", {
+        position: { x: normalizedX, y: normalizedY, z: zPosition },
+        rotation: {
+          x: xRotation * (180 / Math.PI),
+          y: yRotation * (180 / Math.PI),
+          z: zRotation * (180 / Math.PI),
+        },
+        scale,
+      });
 
       // Update model transform
       ref.current.position.set(normalizedX, normalizedY, zPosition);
