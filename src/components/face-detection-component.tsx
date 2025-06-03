@@ -66,7 +66,7 @@ export default function FaceDetectionComponent() {
     
         
    
-      <div className="absolute size-full top-0 left-0">
+      <div className="absolute size-full top-0 left-0 bg-black/30">
         <Canvas
           orthographic 
           camera={{ zoom: 100, position: [0, 0, 10] }}
@@ -99,12 +99,14 @@ export default function FaceDetectionComponent() {
         </div>
       </div> */}
 
-      {/* <Canvas>
+      {/* <Canvas   orthographic 
+          camera={{ zoom: 100, position: [0, 0, 10] }}
+          gl={{ antialias: true }}>
         <PerspectiveCamera makeDefault position={[0,3,10]}/>
           <ambientLight intensity={1} />
           <directionalLight intensity={3} position={[0, 2, 5]} />
           <OrbitControls/>
-          <GlassModel/>
+          <GlassModel landmarks={landmarks}/>
           <Mask landmarks={landmarks}/>
           <gridHelper />
       </Canvas> */}

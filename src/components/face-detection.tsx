@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Landmarks } from "@/lib/types";
+import { Landmarks, Person } from "@/lib/types";
+import { drawFaces } from "@/lib/utils";
 
 export default function FaceDetection({
   onLandmarks = () => {},
@@ -173,7 +174,7 @@ export default function FaceDetection({
             canvas.width = displaySize.width;
             canvas.height = displaySize.height;
             faceapi.matchDimensions(canvas, displaySize)
-            // drawFaces(canvas, result as Person, 120)
+            drawFaces(canvas, result as Person, 120)
    
             faceapi.resizeResults(result, displaySize)
        
@@ -228,6 +229,7 @@ export default function FaceDetection({
         id="overlay"
         className="
           absolute inset-0 
+          object-fill
            size-full
         "
       />
