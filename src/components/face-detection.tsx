@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Landmarks } from "@/lib/types";
+import { Landmarks, Person } from "@/lib/types";
+import { drawFaces } from "@/lib/utils";
 
 export default function FaceDetection({
   onLandmarks = () => {},
@@ -120,13 +121,28 @@ export default function FaceDetection({
 
           const eyeDistance = Math.sqrt(
             Math.pow(rightEye[0].x - leftEye[0].x, 2) +
-              Math.pow(rightEye[0].y - leftEye[0].y, 2)
+            Math.pow(rightEye[0].y - leftEye[0].y, 2)
           );
-
+          const video = videoRef.current
+          const { x, y, width, height } = result.detection.box;
+          // Use clientWidth/clientHeight for scaling to match the rendered size
+          const rect = video.getBoundingClientRect();
+          const scaleX = rect.width / video.videoWidth;
+          const scaleY = rect.height / video.videoHeight;
+          const faceAngle = result.angle
+          // console.log('video size:', video.videoWidth, video.videoHeight);
+          // console.log('display size:', video.clientWidth, video.clientHeight);
+      
           const enhancedLandmarks = {
             ...result.landmarks,
             imageWidth: displaySize.width,
             imageHeight: displaySize.height,
+            faceBox: {
+              width: width * scaleX,
+              height: height * scaleY,
+              x: x * scaleX,
+              y: y * scaleY
+            },
             faceMetrics: {
               eyeDistance,
               eyeSlope,
@@ -139,6 +155,9 @@ export default function FaceDetection({
                 result.detection.box.x + result.detection.box.width / 2,
               faceCenterY:
                 result.detection.box.y + result.detection.box.height / 2,
+                xRotation: faceAngle.pitch,
+                yRotation: faceAngle.yaw,
+                zRotation: faceAngle.roll,
             },
           } as Landmarks;
           setIsDetecting("Face detected");
@@ -147,11 +166,15 @@ export default function FaceDetection({
             canvas.width = displaySize.width;
             canvas.height = displaySize.height;
             faceapi.matchDimensions(canvas, displaySize)
+            drawFaces(canvas, result as Person, 120)
+   
             const resizedResults = faceapi.resizeResults(result, displaySize)
+       
+            // console.log(result.detection.box)
             // draw detections into the canvas
-            faceapi.draw.drawDetections(canvas, resizedResults)
+            // faceapi.draw.drawDetections(canvas, resizedResults)
             // draw the landmarks into the canvas
-            faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
+            // faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
           }
          
           onLandmarks(enhancedLandmarks);
@@ -176,16 +199,17 @@ export default function FaceDetection({
       }
     };
   }, [faceapi, openVideo, onLandmarks]);
-
-
   return (
     <div className="size-full relative">
-      {isDetecting}
+      
       <video
         id="video"
         ref={videoRef}
-
-        className="size-full absolute inset-0 bg-red-600/30 object-cover"
+        className="
+          bg-green-500
+          object-fill
+          size-full
+        "
         autoPlay
         muted
         playsInline
@@ -196,9 +220,13 @@ export default function FaceDetection({
       <canvas
         ref={canvasRef}
         id="overlay"
-       
-        className="absolute inset-0 size-full  object-cover"
+        className="
+          absolute inset-0 bg-red-500/20
+           size-full
+        "
       />
+
+      {/* <div className="bg-black absolute inset-20 w-[128px] border-red-500 border h-[96px]">as</div> */}
       {/* <button onClick={detectFace} >Click me</button> */}
     </div>
   );

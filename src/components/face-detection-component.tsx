@@ -7,6 +7,13 @@ import { Canvas } from "@react-three/fiber";
 // import { OrbitControls } from "@react-three/drei";
 import DynamicModel from "./dynamic-model";
 import ModelSelector from "./model-selector";
+import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { Card, CardContent } from "./ui/card";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "./ui/button";
+import GlassModel from "./glass";
+import Mask from "./mask";
 
 type FaceDetectionProps = {
   onLandmarks: (landmarks: Landmarks | null) => void;
@@ -21,26 +28,85 @@ export default function FaceDetectionComponent() {
   // console.log(landmarks);
   const [landmarks, setLandmarks] = useState<Landmarks | null>(null);
   const [selectedModel, setSelectedModel] = useState(1);
+  const [frameLink, setFrameLink] = useState<string | null>();
   // const [faceDetected, setFaceDetected] = useState<boolean>(null);
+
+
   return (
-    <div className="relative h-dvh w-full ">
+    <div className="size-full relative">
+  
+
+    
       <FaceDetection onLandmarks={setLandmarks} />
       {/* 3D Overlays */}
-      <div className="absolute bg-transparent size-full top-0 left-0">
+      {/* <Link href={'/'} className=" absolute inset-10 h-10 w-10">
+        <ArrowLeft className="text-white h-10 w-10"/>
+      </Link> */}
+      {/* <div className="absolute h-60 bottom-0 left-0 w-full bg-white/50 container grid-cols-2">
+
+        <Button onClick={()=>{setFrameLink("https://mywebar.com/p/Project_0_w74r5egkcp")}}>
+        <Card>
+          <CardContent>Model 1</CardContent>
+        </Card>
+        </Button>
+      </div> */}
+      {/* {frameLink ? (
+        <div className="">
+          <iframe
+            src={frameLink}
+            frameBorder={0}
+            scrolling="yes"
+            style={{ display: "absolute", width: "100%", height: "100vh", top: "-10o", zIndex: 100 }}
+            allow="camera;gyroscope;accelerometer;magnetometer;xr-spatial-tracking;microphone;"
+          ></iframe>
+        </div>
+        
+      ): (
+          <div className="">pick Eye glass</div>
+      )}
+     */}
+      {landmarks?.faceMetrics && (landmarks?.faceMetrics.zRotation >= -5 && landmarks?.faceMetrics.zRotation <= 10) && (
+        
+   
+      <div className="absolute  size-full top-0 left-0">
         <Canvas
-          camera={{ zoom: 100, position: [0, 0, 100] }}
           gl={{ antialias: true }}
-          className="absolute"
-          orthographic
+          className="absolute bg-black/30"
+          style={{
+            width: `${(landmarks?.faceBox.width ??0)}px`,
+            height: `${landmarks?.faceBox.height}px`,
+            left: `${landmarks?.faceBox.x}px`,
+            top: `${landmarks?.faceBox.y}px`
+          }}
         >
-          <ambientLight intensity={0.5} />
+          <PerspectiveCamera makeDefault position={[0,3,10]}/>
+          <ambientLight intensity={1} />
           <directionalLight position={[0, 0, 5]} />
-          {/* <OrbitControls /> */}
-          <DynamicModel landmarks={landmarks} modelNumber={selectedModel} />
-          <axesHelper args={[5]} />
+          <OrbitControls />
+          <gridHelper />
+           <GlassModel landmarks={landmarks}/>
+          <Mask landmarks={landmarks}/>
+          <axesHelper args={[10]} />
         </Canvas>
       </div>
+         )}
       <ModelSelector onModelChange={setSelectedModel} />
+       
+      {/* <div className="absolute top-20 left-10 z-[1000] text-white">
+        <div className="">
+         { landmarks?.faceMetrics?.xRotation}
+        </div>
+      </div> */}
+
+      {/* <Canvas>
+        <PerspectiveCamera makeDefault position={[0,3,10]}/>
+          <ambientLight intensity={1} />
+          <directionalLight intensity={3} position={[0, 2, 5]} />
+          <OrbitControls/>
+          <GlassModel/>
+          <Mask landmarks={landmarks}/>
+          <gridHelper />
+      </Canvas> */}
     </div>
   );
 }

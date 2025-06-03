@@ -2,7 +2,7 @@ import FaceDetectionComponent from "@/components/face-detection-component";
 
 export default function Home() {
   return (
-    <div className="flex justify-center items-center w-full h-screen">
+    <div className="relative h-screen w-screen p-20">
       <FaceDetectionComponent />
     </div>
   );

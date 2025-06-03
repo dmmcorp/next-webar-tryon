@@ -12,7 +12,7 @@ export default function DynamicModel({
   landmarks,
   modelNumber,
 }: DynamicModelProps) {
-  const modelPath = `/model${modelNumber}.glb`;
+  const modelPath = `/Glasses.glb`;
   const { scene } = useGLTF(modelPath);
   const ref = useRef<THREE.Object3D>(null);
 
@@ -31,7 +31,8 @@ export default function DynamicModel({
       const normalizedX = -((faceCenterX / displaySize.width) * 2 - 0.8);
       const normalizedY = -((faceCenterY / displaySize.height) * 2 - 1) - 0.7;
 
-      const scale = eyeDistance / 80;
+      const scale = eyeDistance /50;
+      const scaleX = eyeDistance /70;
       const zPosition = -0.3;
 
       const xRotation =
@@ -40,9 +41,11 @@ export default function DynamicModel({
       const yRotation = (normalizedX * Math.PI) / 12;
       const zRotation = -eyeSlope * 0.8;
 
-      ref.current.position.set(normalizedX, normalizedY, zPosition);
-      ref.current.rotation.set(xRotation, yRotation, zRotation);
-      ref.current.scale.set(scale, scale, scale);
+      ref.current.position.set(0, 0, 0);
+      ref.current.rotation.set(0, 0, 0);
+      ref.current.scale.set(scaleX, scale, 1);
+      
+      
     }
   }, [landmarks]);
 
@@ -50,9 +53,9 @@ export default function DynamicModel({
     <primitive
       ref={ref}
       object={scene}
-      position={[0, 0, -0.5]}
+      position={[0, 0, 0]}
       rotation={[0, 0, 0]}
-      scale={0.1}
+     
     />
   );
 }
