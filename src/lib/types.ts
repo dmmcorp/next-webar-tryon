@@ -17,6 +17,10 @@ export interface FaceMetrics {
     height: number;
   };
   noseBridge: Point[];
+  jawX: number;
+  jawY: number;
+  noseBridgeX: number;
+  noseBridgeY: number;
   faceWidth: number;
   faceHeight: number;
   faceCenterX: number;

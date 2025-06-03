@@ -1,30 +1,48 @@
 import * as THREE from "three";
 import { Landmarks } from "@/lib/types";
 import { useGLTF } from "@react-three/drei";
-import { useRef, useEffect } from "react";
-import { normalizeScale } from "@/lib/utils";
-import { useFrame } from "@react-three/fiber";
+import { useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import { degToRad } from "three/src/math/MathUtils.js";
-
+import gsap from 'gsap'
 export default function GlassModel ({landmarks}: {landmarks: Landmarks | null}){
- const { scene } = useGLTF("/glass-sample.glb");
-   const modelRef = useRef<THREE.Object3D>(null);
-  
-   useFrame(() => {
+  const { scene } = useGLTF("/glass-center.glb");
+  const BASE_FACE_WIDTH = 200;
+  const modelRef = useRef<THREE.Object3D>(null);
+  const { camera, size } = useThree();
+
+  useFrame(() => {
    if (landmarks && modelRef.current) {
-     if(landmarks.faceMetrics) {
+     if(landmarks.faceMetrics && landmarks.faceBox) {
       
-       const roll = landmarks.faceMetrics?.xRotation; // in degrees
-       const yaw = landmarks.faceMetrics?.yRotation; // in degrees
-       const pitch = landmarks.faceMetrics?.zRotation; // in degrees
-       modelRef.current.rotation.x = -degToRad(roll); // in radians
-       modelRef.current.rotation.y = -degToRad(yaw); // in radians
-      //  modelRef.current.rotation.z = degToRad(pitch); // in radians
-       console.log(-degToRad(roll))
-       console.log(roll)
-    
+      const roll = landmarks.faceMetrics?.xRotation; // in degrees
+      const yaw = landmarks.faceMetrics?.yRotation; // in degrees
+      const pitch = landmarks.faceMetrics?.zRotation; // in degrees
+      const faceWidth = landmarks.faceBox.width;
+      const scaleFactor = faceWidth / BASE_FACE_WIDTH;
+      gsap.to(modelRef.current.rotation, {
+        x: -degToRad(roll),
+        y: -degToRad(yaw),
+        z: degToRad(pitch),
+      })
+      gsap.to(modelRef.current.scale, {
+        x: scaleFactor,
+        y: scaleFactor,
+        z: scaleFactor,
+      })
+
+      function screenToWorld(x: number, y: number, width: number, height: number) {
+        const normalizedX = (x / width) * 2 - 1;
+        const normalizedY = -(y / height) * 2 + 1;
+
+        const vector = new THREE.Vector3(normalizedX, normalizedY, 0.5); // z = 0.5 (middle of the scene)
+        vector.unproject(camera); // your THREE.js camera
+        return vector;
+      }
+      const nosePoint = screenToWorld(landmarks.faceMetrics.noseBridgeX, landmarks.faceMetrics.noseBridgeY, size.width, size.height);
+      modelRef.current.position.copy(nosePoint);
      }
    }
  })
-  return   <primitive ref={modelRef} object={scene}  position={[0, -0.6, 0]} scale={[1.6,2,2]}/>
+  return   <primitive ref={modelRef} object={scene}  scale={[1.5,1.2,2]}/>
 }

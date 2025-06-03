@@ -5,13 +5,13 @@ import dynamic from "next/dynamic";
 import { Canvas } from "@react-three/fiber";
 // import Sunglasses from "./sunglasses";
 // import { OrbitControls } from "@react-three/drei";
-import DynamicModel from "./dynamic-model";
+// import DynamicModel from "./dynamic-model";
 import ModelSelector from "./model-selector";
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
-import { Card, CardContent } from "./ui/card";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "./ui/button";
+// import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+// import { Card, CardContent } from "./ui/card";
+// import Link from "next/link";
+// import { ArrowLeft } from "lucide-react";
+// import { Button } from "./ui/button";
 import GlassModel from "./glass";
 import Mask from "./mask";
 
@@ -27,11 +27,9 @@ const FaceDetection = dynamic<FaceDetectionProps>(
 export default function FaceDetectionComponent() {
   // console.log(landmarks);
   const [landmarks, setLandmarks] = useState<Landmarks | null>(null);
-  const [selectedModel, setSelectedModel] = useState(1);
-  const [frameLink, setFrameLink] = useState<string | null>();
+  const [, setSelectedModel] = useState(1);
+  // const [frameLink, setFrameLink] = useState<string | null>();
   // const [faceDetected, setFaceDetected] = useState<boolean>(null);
-
-
   return (
     <div className="size-full relative">
   
@@ -65,33 +63,36 @@ export default function FaceDetectionComponent() {
           <div className="">pick Eye glass</div>
       )}
      */}
-      {landmarks?.faceMetrics && (landmarks?.faceMetrics.zRotation >= -5 && landmarks?.faceMetrics.zRotation <= 10) && (
+    
         
    
-      <div className="absolute  size-full top-0 left-0">
+      <div className="absolute size-full top-0 left-0">
         <Canvas
+          orthographic 
+          camera={{ zoom: 100, position: [0, 0, 10] }}
           gl={{ antialias: true }}
-          className="absolute bg-black/30"
-          style={{
-            width: `${(landmarks?.faceBox.width ??0)}px`,
-            height: `${landmarks?.faceBox.height}px`,
-            left: `${landmarks?.faceBox.x}px`,
-            top: `${landmarks?.faceBox.y}px`
-          }}
+          className="absolute  size-full"
         >
-          <PerspectiveCamera makeDefault position={[0,3,10]}/>
+        
           <ambientLight intensity={1} />
           <directionalLight position={[0, 0, 5]} />
-          <OrbitControls />
-          <gridHelper />
-           <GlassModel landmarks={landmarks}/>
+          {/* <OrbitControls /> */}
+       
+          <GlassModel landmarks={landmarks}/>
           <Mask landmarks={landmarks}/>
-          <axesHelper args={[10]} />
+      
         </Canvas>
       </div>
-         )}
+      
       <ModelSelector onModelChange={setSelectedModel} />
-       
+        <div className="absolute bg-red-500 h-1 w-1 rounded-full"
+          style={{
+            left: `${landmarks?.faceMetrics?.jawX}px`,
+            top: `${landmarks?.faceMetrics?.jawY}px`
+          }}
+        >
+          asd
+        </div>
       {/* <div className="absolute top-20 left-10 z-[1000] text-white">
         <div className="">
          { landmarks?.faceMetrics?.xRotation}

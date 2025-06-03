@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Landmarks, Person } from "@/lib/types";
-import { drawFaces } from "@/lib/utils";
+import { Landmarks } from "@/lib/types";
 
 export default function FaceDetection({
   onLandmarks = () => {},
@@ -15,7 +14,7 @@ export default function FaceDetection({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [openVideo, setOpenVideo] = useState<boolean>(false);
-  const [isDetecting, setIsDetecting] = useState<string>("");
+  const [, setIsDetecting] = useState<string>("");
   const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -109,7 +108,9 @@ export default function FaceDetection({
           const leftEye = landmarks.getLeftEye();
           const rightEye = landmarks.getRightEye();
           const nose = landmarks.getNose();
-
+          const noseBridge = landmarks.getNose()[0];
+          const jaw = landmarks.getJawOutline()
+        
           const faceDepth =
             Math.abs((leftEye[0].y + rightEye[0].y) / 2 - nose[0].y) /
             result.detection.box.height;
@@ -118,7 +119,7 @@ export default function FaceDetection({
             rightEye[0].y - leftEye[0].y,
             rightEye[0].x - leftEye[0].x
           );
-
+          
           const eyeDistance = Math.sqrt(
             Math.pow(rightEye[0].x - leftEye[0].x, 2) +
             Math.pow(rightEye[0].y - leftEye[0].y, 2)
@@ -146,8 +147,12 @@ export default function FaceDetection({
             faceMetrics: {
               eyeDistance,
               eyeSlope,
+              noseBridgeX: noseBridge.x * scaleX,
+              noseBridgeY: noseBridge.y * scaleY,
               faceDepth,
               displaySize,
+              jawX: jaw[0].x * scaleX,
+              jawY: jaw[0].y * scaleY,
               noseBridge: nose,
               faceWidth: result.detection.box.width,
               faceHeight: result.detection.box.height,
@@ -160,15 +165,17 @@ export default function FaceDetection({
                 zRotation: faceAngle.roll,
             },
           } as Landmarks;
+
+      
           setIsDetecting("Face detected");
           if(canvasRef.current) {
             const canvas = canvasRef.current;
             canvas.width = displaySize.width;
             canvas.height = displaySize.height;
             faceapi.matchDimensions(canvas, displaySize)
-            drawFaces(canvas, result as Person, 120)
+            // drawFaces(canvas, result as Person, 120)
    
-            const resizedResults = faceapi.resizeResults(result, displaySize)
+            faceapi.resizeResults(result, displaySize)
        
             // console.log(result.detection.box)
             // draw detections into the canvas
@@ -206,7 +213,6 @@ export default function FaceDetection({
         id="video"
         ref={videoRef}
         className="
-          bg-green-500
           object-fill
           size-full
         "
@@ -221,7 +227,7 @@ export default function FaceDetection({
         ref={canvasRef}
         id="overlay"
         className="
-          absolute inset-0 bg-red-500/20
+          absolute inset-0 
            size-full
         "
       />

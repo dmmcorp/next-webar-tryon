@@ -10,7 +10,7 @@ interface DynamicModelProps {
 
 export default function DynamicModel({
   landmarks,
-  modelNumber,
+  // modelNumber,
 }: DynamicModelProps) {
   const modelPath = `/Glasses.glb`;
   const { scene } = useGLTF(modelPath);
@@ -20,26 +20,26 @@ export default function DynamicModel({
     if (landmarks && ref.current && landmarks.faceMetrics) {
       const {
         eyeDistance,
-        eyeSlope,
-        displaySize,
-        noseBridge,
-        faceHeight,
-        faceCenterX,
-        faceCenterY,
+        // eyeSlope,
+        // displaySize,
+        // noseBridge,
+        // faceHeight,
+        // faceCenterX,
+        // faceCenterY,
       } = landmarks.faceMetrics;
 
-      const normalizedX = -((faceCenterX / displaySize.width) * 2 - 0.8);
-      const normalizedY = -((faceCenterY / displaySize.height) * 2 - 1) - 0.7;
+      // const normalizedX = -((faceCenterX / displaySize.width) * 2 - 0.8);
+      // const normalizedY = -((faceCenterY / displaySize.height) * 2 - 1) - 0.7;
 
       const scale = eyeDistance /50;
       const scaleX = eyeDistance /70;
-      const zPosition = -0.3;
+      // const zPosition = -0.3;
 
-      const xRotation =
-        Math.PI * 0.05 +
-        ((noseBridge[3].y - noseBridge[0].y) / faceHeight) * Math.PI * 0.15;
-      const yRotation = (normalizedX * Math.PI) / 12;
-      const zRotation = -eyeSlope * 0.8;
+      // const xRotation =
+      //   Math.PI * 0.05 +
+      //   ((noseBridge[3].y - noseBridge[0].y) / faceHeight) * Math.PI * 0.15;
+      // const yRotation = (normalizedX * Math.PI) / 12;
+      // const zRotation = -eyeSlope * 0.8;
 
       ref.current.position.set(0, 0, 0);
       ref.current.rotation.set(0, 0, 0);
