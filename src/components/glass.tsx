@@ -21,9 +21,9 @@ export default function GlassModel ({landmarks}: {landmarks: Landmarks | null}){
       const faceWidth = landmarks.faceBox.width;
       const scaleFactor = faceWidth / BASE_FACE_WIDTH;
       gsap.to(modelRef.current.rotation, {
-        x: -degToRad(roll),
+        x: -degToRad(roll) * 1.3,
         y: -degToRad(yaw) * 0.3,
-        z: degToRad(pitch) * 1.3,
+        z: degToRad(pitch),
       })
       gsap.to(modelRef.current.scale, {
         x: scaleFactor * 0.8,
@@ -32,8 +32,8 @@ export default function GlassModel ({landmarks}: {landmarks: Landmarks | null}){
       })
 
       function screenToWorld(x: number, y: number, width: number, height: number) {
-        const normalizedX = (x / width) * 2 - 1;
-        const normalizedY = -(y / height) * 2 + 1;
+        const normalizedX = (x  / width) * 2 - 1;
+        const normalizedY = -((y - 5) / height) * 2 + 1;
 
         const vector = new THREE.Vector3(normalizedX, normalizedY, 0.5); // z = 0.5 (middle of the scene)
         vector.unproject(camera); // your THREE.js camera

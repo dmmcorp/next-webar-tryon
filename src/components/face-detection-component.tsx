@@ -71,7 +71,7 @@ export default function FaceDetectionComponent() {
           orthographic 
           camera={{ zoom: 100, position: [0, 0, 10] }}
           gl={{ antialias: true }}
-          className="absolute  size-full"
+          className="absolute  size-full "
         >
         
           <ambientLight intensity={1} />
@@ -85,14 +85,14 @@ export default function FaceDetectionComponent() {
       </div>
       
       <ModelSelector onModelChange={setSelectedModel} />
-        <div className="absolute bg-red-500 h-1 w-1 rounded-full"
+        {/* <div className="absolute bg-red-500 h-1 w-1 rounded-full"
           style={{
             left: `${landmarks?.faceMetrics?.jawX}px`,
             top: `${landmarks?.faceMetrics?.jawY}px`
           }}
         >
           asd
-        </div>
+        </div> */}
       {/* <div className="absolute top-20 left-10 z-[1000] text-white">
         <div className="">
          { landmarks?.faceMetrics?.xRotation}

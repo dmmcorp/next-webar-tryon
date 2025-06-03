@@ -1,46 +1,64 @@
+'use client'
 import * as THREE from "three";
 import { Landmarks } from "@/lib/types";
 import { useGLTF } from "@react-three/drei";
 import { useRef, useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { degToRad } from "three/src/math/MathUtils.js";
+import gsap from 'gsap'
 
 export default function Mask ({landmarks}: {landmarks: Landmarks | null}){
- const { scene } = useGLTF("/mask.glb");
-   const modelRef = useRef<THREE.Object3D>(null);
-  useEffect(()=>{
-      scene.traverse((child) => {
+ const { scene, materials } = useGLTF("/mask.glb");
+const { camera, size } = useThree();
+ const BASE_FACE_WIDTH = 200
+  const modelRef = useRef<THREE.Object3D>(null);
+ // Make all meshes in the GLTF act as occlusion mask
+  useEffect(() => {
+    scene.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
-        if (Array.isArray(mesh.material)) {
-          mesh.material.forEach((m) => {
-            m.transparent = true;
-            m.opacity = 0;
-            m.depthWrite = true;
-          });
-        } else {
-          mesh.material.transparent = true;
-          mesh.material.opacity = 0;
-          mesh.material.depthWrite = true;
-        }
+        mesh.material = new THREE.MeshBasicMaterial({
+          colorWrite: false,  // Do not render color
+          depthWrite: true,   // Still write depth (so it occludes)
+        });
       }
     });
-  },[scene])
+  }, [scene]);
   useFrame(() => {
-  if (landmarks && modelRef.current) {
-    if(landmarks.faceMetrics) {
-     
+   if (landmarks && modelRef.current) {
+     if(landmarks.faceMetrics && landmarks.faceBox) {
+      
       const roll = landmarks.faceMetrics?.xRotation; // in degrees
       const yaw = landmarks.faceMetrics?.yRotation; // in degrees
       const pitch = landmarks.faceMetrics?.zRotation; // in degrees
-      modelRef.current.rotation.x = -degToRad(roll); // in radians
-      modelRef.current.rotation.y = -degToRad(yaw); // in radians
-      modelRef.current.rotation.z = degToRad(pitch); // in radians
-      // console.log(-degToRad(roll))
-      // console.log(roll)
-    
-    }
-  }
-})
-  return <primitive ref={modelRef} object={scene}   position={[0, 1, 0.5]} scale={[4.5,3.5,1.5]}/>
+      const faceWidth = landmarks.faceBox.width;
+      const scaleFactor = faceWidth / BASE_FACE_WIDTH;
+      gsap.to(modelRef.current.rotation, {
+        x: -degToRad(roll) * 1.3,
+        y: -degToRad(yaw) * 0.3,
+        z: degToRad(pitch) * 1.4,
+      })
+      gsap.to(modelRef.current.scale, {
+        x: scaleFactor * 0.8,
+        y: scaleFactor * 1.3,
+        z: scaleFactor,
+      })
+
+      function screenToWorld(x: number, y: number, width: number, height: number) {
+        const normalizedX = (x  / width) * 2 - 1;
+        const normalizedY = -((y - 5) / height) * 2 + 1;
+
+        const vector = new THREE.Vector3(normalizedX, normalizedY, 0.5); // z = 0.5 (middle of the scene)
+        vector.unproject(camera); // your THREE.js camera
+        return vector;
+      }
+      const nosePoint = screenToWorld(landmarks.faceMetrics.noseBridgeX, landmarks.faceMetrics.noseBridgeY, size.width, size.height);
+      modelRef.current.position.copy(nosePoint);
+     }
+   }
+ })
+  return <primitive 
+      ref={modelRef} object={scene}   
+      position={[0, 1, 0.5]} scale={[1.5,1.2,2]}
+    />
 }

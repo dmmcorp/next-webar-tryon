@@ -174,7 +174,7 @@ export default function FaceDetection({
             canvas.width = displaySize.width;
             canvas.height = displaySize.height;
             faceapi.matchDimensions(canvas, displaySize)
-            drawFaces(canvas, result as Person, 120)
+            // drawFaces(canvas, result as Person, 120)
    
             faceapi.resizeResults(result, displaySize)
        
