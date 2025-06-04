@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Landmarks, Model } from "@/lib/types";
+import { Landmarks, Variants } from "@/lib/types";
 import { useGLTF } from "@react-three/drei";
 import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -7,12 +7,12 @@ import { degToRad } from "three/src/math/MathUtils.js";
 import gsap from 'gsap'
 export default function GlassModel ({
   landmarks,
-  selectedModel
+  selectedVariant
 }: {
   landmarks: Landmarks | null;
-  selectedModel: Model
+  selectedVariant: Variants
 }){
-  const { scene } = useGLTF(selectedModel.path);
+  const { scene } = useGLTF(selectedVariant.path);
   const BASE_FACE_WIDTH = 190;
   const modelRef = useRef<THREE.Object3D>(null);
   const { camera, size } = useThree();

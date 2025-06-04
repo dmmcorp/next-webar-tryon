@@ -16,7 +16,7 @@ export default function DynamicModel({
   return (
     <GlassModel 
       landmarks={landmarks} 
-      selectedModel={selectedModel}
+      selectedVariant={selectedModel}
     />
   );
 }

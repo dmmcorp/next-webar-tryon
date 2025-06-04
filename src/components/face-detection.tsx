@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Landmarks, Person } from "@/lib/types";
-import { drawFaces } from "@/lib/utils";
+import { Landmarks } from "@/lib/types";
 import useFaceDetection from "@/stores/useFaceDetection";
 
 export default function FaceDetection({
@@ -100,8 +99,6 @@ export default function FaceDetection({
           .withFaceDescriptor();
 
         if (result) {
-          // console.log("Face detected:", result);
-
           const landmarks = result.landmarks;
           const leftEye = landmarks.getLeftEye();
           const rightEye = landmarks.getRightEye();
@@ -124,14 +121,10 @@ export default function FaceDetection({
           );
           const video = videoRef.current
           const { x, y, width, height } = result.detection.box;
-          // Use clientWidth/clientHeight for scaling to match the rendered size
           const rect = video.getBoundingClientRect();
           const scaleX = rect.width / video.videoWidth;
           const scaleY = rect.height / video.videoHeight;
           const faceAngle = result.angle
-          // console.log('video size:', video.videoWidth, video.videoHeight);
-          // console.log('display size:', video.clientWidth, video.clientHeight);
-      
           const enhancedLandmarks = {
             ...result.landmarks,
             imageWidth: displaySize.width,
@@ -163,8 +156,6 @@ export default function FaceDetection({
                 zRotation: faceAngle.roll,
             },
           } as Landmarks;
-
-      
           setIsDetecting("Face detected");
           useFaceDetection.getState().setIsDetected(true);
           if(canvasRef.current) {
@@ -172,17 +163,8 @@ export default function FaceDetection({
             canvas.width = displaySize.width;
             canvas.height = displaySize.height;
             faceapi.matchDimensions(canvas, displaySize)
-            drawFaces(canvas, result as Person, 120)
-   
             faceapi.resizeResults(result, displaySize)
-       
-            // console.log(result.detection.box)
-            // draw detections into the canvas
-            // faceapi.draw.drawDetections(canvas, resizedResults)
-            // draw the landmarks into the canvas
-            // faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
           }
-         
           onLandmarks(enhancedLandmarks);
         } else {
           useFaceDetection.getState().setIsDetected(false);
@@ -192,7 +174,6 @@ export default function FaceDetection({
         console.error("Detection error:", err);
         setError("Detection error");
       }
-
       animationId = requestAnimationFrame(runDetection);
     };
 
@@ -232,9 +213,6 @@ export default function FaceDetection({
            size-full
         "
       />
-
-      {/* <div className="bg-black absolute inset-20 w-[128px] border-red-500 border h-[96px]">as</div> */}
-      {/* <button onClick={detectFace} >Click me</button> */}
     </div>
   );
 }

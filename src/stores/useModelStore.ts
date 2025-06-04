@@ -1,23 +1,19 @@
 // stores/useModelStore.ts
-import { Model } from "@/lib/types";
+import { Variants } from "@/lib/types";
 import { create } from "zustand";
 
 type ModelStore = {
-  models: Model[];
-  selectedModel: Model | null;
-  setModels: (models: Model[]) => void;
-  selectModel: (model: Model) => void;
+  selectedModel: Variants | null;
+  selectModel: (model: Variants | null) => void;
 };
 
 const useModelStore = create<ModelStore>((set) => ({
-  models: [],
   selectedModel: {
-    name: "Glass A",
-    variant: "Black Frame",
+    model: "Sample",
+    variant: "Glass A",
     path: "/assets/sample/glass-center.glb",
   },
-  setModels: (models) => set({ models }),
-  selectModel: (model) => set({ selectedModel: model }),
+  selectModel: (model: Variants | null) => set({ selectedModel: model }),
 }));
 
 export default useModelStore;
