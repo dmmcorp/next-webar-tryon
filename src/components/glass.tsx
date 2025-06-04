@@ -32,8 +32,8 @@ export default function GlassModel ({
         z: degToRad(pitch) * 1.2,
       })
       gsap.to(modelRef.current.scale, {
-        x: scaleFactor * 0.8,
-        y: scaleFactor * 1.3,
+        x: scaleFactor * 0.7,
+        y: scaleFactor * 1,
         z: scaleFactor,
       })
 

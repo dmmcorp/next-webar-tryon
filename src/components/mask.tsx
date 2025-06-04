@@ -39,7 +39,7 @@ export default function Mask ({landmarks}: {landmarks: Landmarks | null}){
         z: degToRad(pitch) * 0.3,
       })
       gsap.to(modelRef.current.scale, {
-        x: scaleFactor * 0.8,
+        x: scaleFactor * 0.7,
         y: scaleFactor * 1.3,
         z: scaleFactor,
       })
