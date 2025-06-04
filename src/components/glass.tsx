@@ -1,18 +1,24 @@
 import * as THREE from "three";
-import { Landmarks } from "@/lib/types";
+import { Landmarks, Model } from "@/lib/types";
 import { useGLTF } from "@react-three/drei";
 import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { degToRad } from "three/src/math/MathUtils.js";
 import gsap from 'gsap'
-export default function GlassModel ({landmarks}: {landmarks: Landmarks | null}){
-  const { scene } = useGLTF("/glass-center.glb");
-  const BASE_FACE_WIDTH = 200;
+export default function GlassModel ({
+  landmarks,
+  selectedModel
+}: {
+  landmarks: Landmarks | null;
+  selectedModel: Model
+}){
+  const { scene } = useGLTF(selectedModel.path);
+  const BASE_FACE_WIDTH = 190;
   const modelRef = useRef<THREE.Object3D>(null);
   const { camera, size } = useThree();
 
   useFrame(() => {
-   if (landmarks && modelRef.current) {
+   if ( landmarks && modelRef.current) {
      if(landmarks.faceMetrics && landmarks.faceBox) {
       
       const roll = landmarks.faceMetrics?.xRotation; // in degrees
@@ -23,7 +29,7 @@ export default function GlassModel ({landmarks}: {landmarks: Landmarks | null}){
       gsap.to(modelRef.current.rotation, {
         x: -degToRad(roll) * 1.3,
         y: -degToRad(yaw) * 0.3,
-        z: degToRad(pitch),
+        z: degToRad(pitch) * 1.2,
       })
       gsap.to(modelRef.current.scale, {
         x: scaleFactor * 0.8,

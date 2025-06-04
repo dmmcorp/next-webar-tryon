@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Landmarks, Person } from "@/lib/types";
 import { drawFaces } from "@/lib/utils";
+import useFaceDetection from "@/stores/useFaceDetection";
 
 export default function FaceDetection({
   onLandmarks = () => {},
@@ -27,6 +28,7 @@ export default function FaceDetection({
       } catch (error) {
         console.error("Error loading libraries:", error);
         setIsDetecting("Error loading required libraries");
+        useFaceDetection.getState().setIsDetected(false);
       }
     }
 
@@ -52,6 +54,7 @@ export default function FaceDetection({
       } catch (error) {
         console.error("Error loading models:", error);
         setIsDetecting("Error loading face detection models");
+        useFaceDetection.getState().setIsDetected(false);
       }
     }
 
@@ -83,14 +86,8 @@ export default function FaceDetection({
         animationId = requestAnimationFrame(runDetection);
         return;
       }
-
       try {
-
-        
         const displaySize = { width: videoRef.current.videoWidth, height: videoRef.current.videoHeight }
-   
-       
-
         const result = await faceapi
           .detectSingleFace(
             videoRef.current,
@@ -169,12 +166,13 @@ export default function FaceDetection({
 
       
           setIsDetecting("Face detected");
+          useFaceDetection.getState().setIsDetected(true);
           if(canvasRef.current) {
             const canvas = canvasRef.current;
             canvas.width = displaySize.width;
             canvas.height = displaySize.height;
             faceapi.matchDimensions(canvas, displaySize)
-            // drawFaces(canvas, result as Person, 120)
+            drawFaces(canvas, result as Person, 120)
    
             faceapi.resizeResults(result, displaySize)
        
@@ -187,6 +185,7 @@ export default function FaceDetection({
          
           onLandmarks(enhancedLandmarks);
         } else {
+          useFaceDetection.getState().setIsDetected(false);
           setIsDetecting("No face");
         }
       } catch (err) {

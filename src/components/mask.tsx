@@ -8,9 +8,9 @@ import { degToRad } from "three/src/math/MathUtils.js";
 import gsap from 'gsap'
 
 export default function Mask ({landmarks}: {landmarks: Landmarks | null}){
- const { scene, materials } = useGLTF("/mask.glb");
-const { camera, size } = useThree();
- const BASE_FACE_WIDTH = 200
+  const { scene } = useGLTF("/face-guide.glb");
+  const { camera, size } = useThree();
+  const BASE_FACE_WIDTH = 200
   const modelRef = useRef<THREE.Object3D>(null);
  // Make all meshes in the GLTF act as occlusion mask
   useEffect(() => {
@@ -36,7 +36,7 @@ const { camera, size } = useThree();
       gsap.to(modelRef.current.rotation, {
         x: -degToRad(roll) * 1.3,
         y: -degToRad(yaw) * 0.3,
-        z: degToRad(pitch) * 1.4,
+        z: degToRad(pitch) * 0.3,
       })
       gsap.to(modelRef.current.scale, {
         x: scaleFactor * 0.8,
@@ -45,7 +45,7 @@ const { camera, size } = useThree();
       })
 
       function screenToWorld(x: number, y: number, width: number, height: number) {
-        const normalizedX = (x  / width) * 2 - 1;
+        const normalizedX = ((x + 5)  / (width + 1)) * 2 - 1;
         const normalizedY = -((y - 5) / height) * 2 + 1;
 
         const vector = new THREE.Vector3(normalizedX, normalizedY, 0.5); // z = 0.5 (middle of the scene)
@@ -59,6 +59,6 @@ const { camera, size } = useThree();
  })
   return <primitive 
       ref={modelRef} object={scene}   
-      position={[0, 1, 0.5]} scale={[1.5,1.2,2]}
+      position={[0, 1, 1]} scale={[1.5,1.2,2]}
     />
 }

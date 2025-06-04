@@ -79,3 +79,9 @@ export type Person = {
     positions: LandmarkPoint[];
   };
 };
+
+export type Model = {
+  name: string;
+  variant: string;
+  path: string;
+};
