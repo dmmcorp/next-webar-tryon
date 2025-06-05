@@ -27,7 +27,7 @@ export default function GlassModel ({
       const faceWidth = landmarks.faceBox.width;
       const scaleFactor = faceWidth / BASE_FACE_WIDTH;
       gsap.to(modelRef.current.rotation, {
-        x: -degToRad(roll) * 1.3,
+        x: -degToRad(roll) * 0.6,
         y: -degToRad(yaw) * 0.3,
         z: degToRad(pitch) * 1.2,
       })
