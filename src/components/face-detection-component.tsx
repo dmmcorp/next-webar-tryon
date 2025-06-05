@@ -7,7 +7,6 @@ import ModelSelector from "./model-selector";
 import Mask from "./mask";
 import useFaceDetection from "@/stores/useFaceDetection";
 import DynamicModel from "./dynamic-model";
-import BackButton from "./back-button";
 
 type FaceDetectionProps = {
   onLandmarks: (landmarks: Landmarks | null) => void;
@@ -22,7 +21,7 @@ export default function FaceDetectionComponent() {
   const [landmarks, setLandmarks] = useState<Landmarks | null>(null);
   return (
     <div className="size-full relative">
-      <BackButton/>
+  
       <FaceDetection onLandmarks={setLandmarks} />
       <div className="absolute size-full top-0 left-0">
         <Canvas
