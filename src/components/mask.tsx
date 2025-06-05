@@ -8,7 +8,7 @@ import { degToRad } from "three/src/math/MathUtils.js";
 import gsap from 'gsap'
 
 export default function Mask ({landmarks}: {landmarks: Landmarks | null}){
-  const { scene } = useGLTF("/face-guide.glb");
+  const { scene } = useGLTF("/mask.glb");
   const { camera, size } = useThree();
   const BASE_FACE_WIDTH = 200
   const modelRef = useRef<THREE.Object3D>(null);
@@ -35,7 +35,7 @@ export default function Mask ({landmarks}: {landmarks: Landmarks | null}){
       const scaleFactor = faceWidth / BASE_FACE_WIDTH;
       gsap.to(modelRef.current.rotation, {
         x: -degToRad(roll) * 1.3,
-        y: -degToRad(yaw) * 0.3,
+        y: -degToRad(yaw) * 0.36,
         z: degToRad(pitch) * 0.3,
       })
       gsap.to(modelRef.current.scale, {
@@ -45,7 +45,7 @@ export default function Mask ({landmarks}: {landmarks: Landmarks | null}){
       })
 
       function screenToWorld(x: number, y: number, width: number, height: number) {
-        const normalizedX = ((x)  / (width + 1)) * 2 - 1;
+        const normalizedX = ((x + 5)  / (width + 1)) * 2 - 1;
         const normalizedY = -((y - 5) / height) * 2 + 1;
 
         const vector = new THREE.Vector3(normalizedX, normalizedY, 0.5); // z = 0.5 (middle of the scene)
