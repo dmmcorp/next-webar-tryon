@@ -38,7 +38,7 @@ export default function GlassModel ({
       })
 
       function screenToWorld(x: number, y: number, width: number, height: number) {
-        const normalizedX = (x  / width) * 2 - 1;
+        const normalizedX = ((x + 5)  / width) * 2 - 1;
         const normalizedY = -((y - 5) / height) * 2 + 1;
 
         const vector = new THREE.Vector3(normalizedX, normalizedY, 0.5); // z = 0.5 (middle of the scene)

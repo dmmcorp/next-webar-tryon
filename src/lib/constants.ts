@@ -8,7 +8,7 @@ export const variants = [
   {
     model: "Sample",
     variant: "Glass B",
-    path: "/assets/sample/model1.glb",
+    path: "/assets/sample/model1-center.glb",
   },
 ];
 

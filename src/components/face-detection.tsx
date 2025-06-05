@@ -196,6 +196,7 @@ export default function FaceDetection({
         className="
           object-fill
           size-full
+          -scale-x-100
         "
         autoPlay
         muted
@@ -211,6 +212,7 @@ export default function FaceDetection({
           absolute inset-0 
           object-fill
            size-full
+           scale-x-[-1]
         "
       />
     </div>

@@ -28,7 +28,7 @@ export default function FaceDetectionComponent() {
           orthographic 
           camera={{ zoom: 100, position: [0, 0, 10] }}
           gl={{ antialias: true }}
-          className="absolute  size-full "
+          className="absolute  size-full scale-x-[-1] "
         >
           <ambientLight intensity={1} />
           <directionalLight position={[0, 0, 5]} />
