@@ -25,11 +25,11 @@ export default function ModelSelector() {
   }
   const filteredVariants = variants.filter((variant)=> variant.model === model)
   return (
-    <div className='absolute bottom-0 left-0 w-full h-[35%] max-h-[35%] overflow-auto bg-black/25 backdrop-blur-2xl'>
+    <div className='absolute bottom-0 left-0 w-full h-[30%] max-h-[30%] overflow-auto bg-black/25 backdrop-blur-2xl'>
       <div className="relative h-full w-full">
    {(step === 0 || model === null) && (
   <div className='py-4'>
-    <h3 className="text-lg px-4 font-semibold mb-6 text-gray-900 ">Choose Model</h3>
+    <h3 className="text-lg px-4 font-semibold mb-3 text-gray-900">Choose Model</h3>
 
     <div className="w-full h-full overflow-auto">
       <div className="grid grid-cols-3 gap-4 w-full px-5">
@@ -56,7 +56,7 @@ export default function ModelSelector() {
 
       {model && step === 1 && (
         <div className='py-4'>
-          <div className="px-2 mb-6">
+          <div className="px-2">
             <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold pl-2 text-gray-900">{model}</h3>
               <Button variant={'ghost'} onClick={handleChangeModel} className='text-blue-600'>Change model</Button>
