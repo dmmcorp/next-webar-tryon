@@ -47,12 +47,12 @@ export default function GlassModel ({
       }
       const nosePoint = screenToWorld(landmarks.faceMetrics.noseBridgeX, landmarks.faceMetrics.noseBridgeY, size.width, size.height);
       // Move the model slightly backward along the z-axis
-       gsap.to(modelRef.current.scale.copy, {
+      gsap.to(modelRef.current.position.copy, {
         x: nosePoint.x,
         y: nosePoint.y,
         z: nosePoint.z
       })
-      // modelRef.current.position.copy(nosePoint);
+      modelRef.current.position.copy(nosePoint);
      }
    }
  })
