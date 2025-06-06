@@ -32,12 +32,12 @@ export default function FaceDetectionComponent() {
         >
           <ambientLight intensity={1} />
           <directionalLight position={[0, 0, 5]} />
+          <DynamicModel landmarks={landmarks}/>
           {isDetected && (
-            <>
-              <DynamicModel landmarks={landmarks}/>
-              <Mask landmarks={landmarks}/>
-            </>
+
+            <Mask landmarks={landmarks}/>
           )}
+        
         </Canvas>
       </div>
       <ModelSelector/>

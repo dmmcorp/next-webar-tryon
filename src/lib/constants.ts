@@ -1,4 +1,5 @@
 import Sample from "@/../public/assets/sample/glass-center.png";
+import Leto from "@/../public/assets/leto/stone.png";
 export const variants = [
   {
     model: "Sample",
@@ -9,6 +10,21 @@ export const variants = [
     model: "Sample",
     variant: "Glass B",
     path: "/assets/sample/model1-center.glb",
+  },
+  {
+    model: "Leto",
+    variant: "Stone",
+    path: "/assets/leto/stone.glb",
+  },
+  {
+    model: "Leto",
+    variant: "Rich Black",
+    path: "/assets/leto/rich-black.glb",
+  },
+  {
+    model: "Leto",
+    variant: "Quartz",
+    path: "/assets/leto/quartz.glb",
   },
 ];
 
@@ -38,8 +54,8 @@ export const models = [
     image: Sample,
   },
   {
-    name: "Lato",
-    image: Sample,
+    name: "Leto",
+    image: Leto,
   },
   {
     name: "Lindy",

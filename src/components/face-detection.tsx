@@ -91,7 +91,7 @@ export default function FaceDetection({
           .detectSingleFace(
             videoRef.current,
             new faceapi.TinyFaceDetectorOptions({
-              inputSize: 320,
+              inputSize: 160,
               scoreThreshold: 0.5,
             })
           )

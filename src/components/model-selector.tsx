@@ -25,7 +25,7 @@ export default function ModelSelector() {
   }
   const filteredVariants = variants.filter((variant)=> variant.model === model)
   return (
-    <div className='absolute bottom-10 w-full h-44 bg-white/60 backdrop-blur-2xl'>
+    <div className='w-full h-44 bg-white/60 backdrop-blur-2xl'>
       <div className="relative">
    {(step === 0 || model === null) && (
   <div className='py-4'>
