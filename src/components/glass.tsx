@@ -32,20 +32,21 @@ export default function GlassModel ({
         z: degToRad(pitch) * 1.2,
       })
       gsap.to(modelRef.current.scale, {
-        x: scaleFactor * 0.7,
+        x: scaleFactor * 0.6,
         y: scaleFactor * 0.8,
         z: scaleFactor,
       })
 
       function screenToWorld(x: number, y: number, width: number, height: number) {
         const normalizedX = ((x)  / width) * 2 - 1;
-        const normalizedY = -((y - 5) / height) * 2 + 1;
+        const normalizedY = -((y) / height) * 2 + 1;
 
         const vector = new THREE.Vector3(normalizedX, normalizedY, 0.5); // z = 0.5 (middle of the scene)
         vector.unproject(camera); // your THREE.js camera
         return vector;
       }
       const nosePoint = screenToWorld(landmarks.faceMetrics.noseBridgeX, landmarks.faceMetrics.noseBridgeY, size.width, size.height);
+      // Move the model slightly backward along the z-axis
       modelRef.current.position.copy(nosePoint);
      }
    }

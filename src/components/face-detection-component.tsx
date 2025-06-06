@@ -21,25 +21,25 @@ export default function FaceDetectionComponent() {
   const [landmarks, setLandmarks] = useState<Landmarks | null>(null);
   return (
     <div className="size-full relative">
-  
-      <FaceDetection onLandmarks={setLandmarks} />
-      <div className="absolute size-full top-0 left-0">
-        <Canvas
-          orthographic 
-          camera={{ zoom: 100, position: [0, 0, 10] }}
-          gl={{ antialias: true }}
-          className="absolute  size-full scale-x-[-1] "
-        >
-          <ambientLight intensity={1} />
-          <directionalLight position={[0, 0, 5]} />
-          <DynamicModel landmarks={landmarks}/>
-          {isDetected && (
-
-            <Mask landmarks={landmarks}/>
-          )}
-        
-        </Canvas>
+      <div className="w-full h-[70%] relative">
+        <FaceDetection onLandmarks={setLandmarks} />
+        <div className="absolute size-full top-0 left-0">
+          <Canvas
+            orthographic 
+            camera={{ zoom: 100, position: [0, 0, 10] }}
+            gl={{ antialias: true }}
+            className="absolute  size-full scale-x-[-1] "
+          >
+            <ambientLight intensity={1} />
+            <directionalLight position={[0, 0, 5]} />
+            <DynamicModel landmarks={landmarks}/>
+            {isDetected && (
+              <Mask landmarks={landmarks}/>
+            )}
+          </Canvas>
+        </div>
       </div>
+      
       <ModelSelector/>
     </div>
   );

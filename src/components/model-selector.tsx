@@ -25,14 +25,14 @@ export default function ModelSelector() {
   }
   const filteredVariants = variants.filter((variant)=> variant.model === model)
   return (
-    <div className='w-full h-44 bg-white/60 backdrop-blur-2xl'>
+    <div className='absolute bottom-0 left-0 w-full h-[30%] bg-black/25 backdrop-blur-2xl'>
       <div className="relative">
    {(step === 0 || model === null) && (
   <div className='py-4'>
     <h3 className="text-lg px-4 font-semibold mb-3 text-gray-900">Choose Model</h3>
 
-    <div className="w-full overflow-x-auto">
-      <div className="flex gap-4 w-max px-5">
+    <div className="w-full overflow-auto">
+      <div className="grid grid-cols-4 gap-4 w-full px-5">
         {models.map((model, index) => (
           <Button 
             variant={'ghost'}
@@ -65,13 +65,13 @@ export default function ModelSelector() {
           </div>
           {filteredVariants.length > 0 ? (
           <div className="w-full overflow-x-auto">
-            <div className="flex gap-4 w-max px-5">
+            <div className="grid grid-cols-4 gap-4 w-full px-5">
               {filteredVariants.map((variant)=>(
                  <Button 
                   variant={'ghost'}
                   key={variant.path}
                   className={cn(
-                    selectedModel?.path === variant.path && "bg-amber-200/50 border-amber-200 border-4 rounded-2xl",
+                    selectedModel?.path === variant.path && "bg-amber-200/50 border-yellow-50 border-4 rounded-2xl",
                     "relative size-24 flex items-center justify-center bg-gray-50/60 rounded-md overflow-hidden cursor-pointer shadow-sm shrink-0 capitalize")}
                   onClick={() => selectModel(variant)}
                 >
