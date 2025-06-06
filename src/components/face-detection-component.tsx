@@ -21,7 +21,7 @@ export default function FaceDetectionComponent() {
   const [landmarks, setLandmarks] = useState<Landmarks | null>(null);
   return (
     <div className="size-full relative">
-      <div className="w-full h-[70%] relative">
+      <div className="w-full h-[65%] relative">
         <FaceDetection onLandmarks={setLandmarks} />
         <div className="absolute size-full top-0 left-0">
           <Canvas

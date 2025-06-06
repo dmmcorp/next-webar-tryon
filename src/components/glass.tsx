@@ -33,7 +33,7 @@ export default function GlassModel ({
       })
       gsap.to(modelRef.current.scale, {
         x: scaleFactor * 0.6,
-        y: scaleFactor * 0.8,
+        y: scaleFactor * 0.75,
         z: scaleFactor,
       })
 
@@ -47,7 +47,12 @@ export default function GlassModel ({
       }
       const nosePoint = screenToWorld(landmarks.faceMetrics.noseBridgeX, landmarks.faceMetrics.noseBridgeY, size.width, size.height);
       // Move the model slightly backward along the z-axis
-      modelRef.current.position.copy(nosePoint);
+       gsap.to(modelRef.current.scale.copy, {
+        x: nosePoint.x,
+        y: nosePoint.y,
+        z: nosePoint.z
+      })
+      // modelRef.current.position.copy(nosePoint);
      }
    }
  })
