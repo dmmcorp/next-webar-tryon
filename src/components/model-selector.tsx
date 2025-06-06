@@ -25,14 +25,14 @@ export default function ModelSelector() {
   }
   const filteredVariants = variants.filter((variant)=> variant.model === model)
   return (
-    <div className='absolute bottom-0 left-0 w-full h-[30%] bg-black/25 backdrop-blur-2xl'>
-      <div className="relative">
+    <div className='absolute bottom-0 left-0 w-full h-[30%] max-h-[30%] overflow-auto bg-black/25 backdrop-blur-2xl'>
+      <div className="relative h-full w-full">
    {(step === 0 || model === null) && (
   <div className='py-4'>
     <h3 className="text-lg px-4 font-semibold mb-3 text-gray-900">Choose Model</h3>
 
-    <div className="w-full overflow-auto">
-      <div className="grid grid-cols-4 gap-4 w-full px-5">
+    <div className="w-full h-full overflow-auto">
+      <div className="grid grid-cols-3 gap-4 w-full px-5">
         {models.map((model, index) => (
           <Button 
             variant={'ghost'}
@@ -64,8 +64,8 @@ export default function ModelSelector() {
         
           </div>
           {filteredVariants.length > 0 ? (
-          <div className="w-full overflow-x-auto">
-            <div className="grid grid-cols-4 gap-4 w-full px-5">
+          <div className="w-full">
+            <div className="grid grid-cols-3 gap-4 w-full px-5">
               {filteredVariants.map((variant)=>(
                  <Button 
                   variant={'ghost'}

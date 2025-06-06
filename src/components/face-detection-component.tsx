@@ -17,7 +17,7 @@ const FaceDetection = dynamic<FaceDetectionProps>(
 );
 
 export default function FaceDetectionComponent() {
-  const isDetected = useFaceDetection((state) => state.isDetected);
+  const {isDetected, firstDetection} = useFaceDetection();
   const [landmarks, setLandmarks] = useState<Landmarks | null>(null);
   return (
     <div className="size-full relative">
@@ -32,7 +32,9 @@ export default function FaceDetectionComponent() {
           >
             <ambientLight intensity={1} />
             <directionalLight position={[0, 0, 5]} />
-            <DynamicModel landmarks={landmarks}/>
+            {firstDetection && (
+              <DynamicModel landmarks={landmarks}/>
+            )}
             {isDetected && (
               <Mask landmarks={landmarks}/>
             )}

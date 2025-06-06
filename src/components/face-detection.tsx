@@ -17,6 +17,7 @@ export default function FaceDetection({
   const [openVideo, setOpenVideo] = useState<boolean>(false);
   const [, setIsDetecting] = useState<string>("");
   const [, setError] = useState<string | null>(null);
+  const {setFirstDetection} = useFaceDetection()
 
   useEffect(() => {
     async function loadLibraries() {
@@ -79,13 +80,14 @@ export default function FaceDetection({
 
   useEffect(() => {
     let animationId: number;
-
+    setFirstDetection(true)
     const runDetection = async () => {
       if (!faceapi || !videoRef.current || videoRef.current.readyState !== 4)  {
         animationId = requestAnimationFrame(runDetection);
         return;
       }
       try {
+
         const displaySize = { width: videoRef.current.videoWidth, height: videoRef.current.videoHeight }
         const result = await faceapi
           .detectSingleFace(
