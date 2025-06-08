@@ -53,7 +53,11 @@ export default function Mask ({landmarks}: {landmarks: Landmarks | null}){
         return vector;
       }
       const nosePoint = screenToWorld(landmarks.faceMetrics.noseBridgeX, landmarks.faceMetrics.noseBridgeY, size.width, size.height);
-      modelRef.current.position.copy(nosePoint);
+       gsap.to(modelRef.current.position, {
+        x: nosePoint.x,
+        y: nosePoint.y,
+        z: nosePoint.z
+      })
      }
    }
  })
