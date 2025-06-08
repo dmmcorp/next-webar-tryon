@@ -1,205 +1,210 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { Landmarks } from "@/lib/types";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { Landmarks, Person } from "@/lib/types";
 import useFaceDetection from "@/stores/useFaceDetection";
+import { useLoadFaceApi } from "@/hooks/useLoadFaceApi";
+import { drawFaces } from "@/lib/utils";
 
 export default function FaceDetection({
   onLandmarks = () => {},
 }: {
   onLandmarks: (landmark: Landmarks | null) => void;
 }) {
-  const [faceapi, setFaceapi] = useState<
-    typeof import("@vladmandic/face-api") | null
-  >(null);
-  const [, setIsLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [openVideo, setOpenVideo] = useState<boolean>(false);
   const [, setIsDetecting] = useState<string>("");
   const [, setError] = useState<string | null>(null);
-  const {setFirstDetection} = useFaceDetection()
+  const { faceapi, isLoading } = useLoadFaceApi();
+  
+  // Refs for optimization
+  const detectionStateRef = useRef({
+    isDetecting: false,
+    lastDetectionTime: 0,
+    animationId: 0,
+    faceDetectedCount: 0,
+    noFaceCount: 0,
+  });
 
-  useEffect(() => {
-    async function loadLibraries() {
-      try {
-        const faceapiModule = await import("@vladmandic/face-api");
-        setFaceapi(faceapiModule);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error loading libraries:", error);
-        setIsDetecting("Error loading required libraries");
-        useFaceDetection.getState().setIsDetected(false);
-      }
-    }
-
-    loadLibraries();
-    // Cleanup function
-    return () => {
-      // Optional: Add any cleanup needed for face-api
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!faceapi) return;
-
-    async function loadModels() {
-      try {
-        const modelPath = "/models";
-        await Promise.all([
-          faceapi?.nets.ssdMobilenetv1.loadFromUri(modelPath),
-          faceapi?.nets.tinyFaceDetector.loadFromUri(modelPath),
-          faceapi?.nets.faceLandmark68Net.loadFromUri(modelPath),
-          faceapi?.nets.faceRecognitionNet.loadFromUri(modelPath),
-        ]);
-      } catch (error) {
-        console.error("Error loading models:", error);
-        setIsDetecting("Error loading face detection models");
-        useFaceDetection.getState().setIsDetected(false);
-      }
-    }
-
-    loadModels();
-
-    setOpenVideo(true);
-    startVideo();
+  // Memoized detector options for better performance
+  const detectorOptions = useMemo(() => {
+    if (!faceapi) return null;
+    return new faceapi.TinyFaceDetectorOptions({
+      inputSize: 320, // Reduced from 360 for better performance
+      scoreThreshold: 0.6, // Slightly higher threshold
+    });
   }, [faceapi]);
 
-  const startVideo = async () => {
-    if (videoRef.current) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
-        videoRef.current.srcObject = stream;
+  // Optimized detection function with better throttling
+  const runDetection = useCallback(async (timestamp: number) => {
+    const state = detectionStateRef.current;
+    const detectionInterval = 100; // Reduced to ~10 FPS for better performance
+    
+    // Schedule next frame early
+    state.animationId = requestAnimationFrame((ts) => runDetection(ts));
 
-      } catch (error) {
-        console.error("Error accessing webcam:", error);
-      }
+    // Enhanced throttling
+    if (state.isDetecting || timestamp - state.lastDetectionTime < detectionInterval) {
+      return;
     }
-  };
 
-  useEffect(() => {
-    let animationId: number;
-    setFirstDetection(true)
-    const runDetection = async () => {
-      if (!faceapi || !videoRef.current || videoRef.current.readyState !== 4)  {
-        animationId = requestAnimationFrame(runDetection);
+    state.lastDetectionTime = timestamp;
+    state.isDetecting = true;
+
+    try {
+      const video = videoRef.current;
+      if (!video || video.readyState !== 4 || !faceapi) {
         return;
       }
-      try {
 
-        const displaySize = { width: videoRef.current.videoWidth, height: videoRef.current.videoHeight }
-        const result = await faceapi
-          .detectSingleFace(
-            videoRef.current,
-            new faceapi.TinyFaceDetectorOptions({
-              inputSize: 160,
-              scoreThreshold: 0.3,
-            })
-          )
-          .withFaceLandmarks()
-          .withFaceDescriptor();
+      // Cache video dimensions to avoid repeated DOM queries
+      const displaySize = {
+        width: video.videoWidth,
+        height: video.videoHeight,
+      };
 
-        if (result) {
+      // Check if we have valid detector options
+      if (!detectorOptions) {
+        return;
+      }
+
+      // Use the memoized detector options
+      const result = await faceapi
+        .detectSingleFace(video, detectorOptions)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+      if (result) {
+        state.faceDetectedCount++;
+        state.noFaceCount = 0;
+
+        // Only process landmarks if we have consistent detection
+        if (state.faceDetectedCount >= 2) {
           const landmarks = result.landmarks;
-          const leftEye = landmarks.getLeftEye();
-          const rightEye = landmarks.getRightEye();
           const nose = landmarks.getNose();
-          const noseBridge = landmarks.getNose()[0];
-          const jaw = landmarks.getJawOutline()
-        
-          const faceDepth =
-            Math.abs((leftEye[0].y + rightEye[0].y) / 2 - nose[0].y) /
-            result.detection.box.height;
-
-          const eyeSlope = Math.atan2(
-            rightEye[0].y - leftEye[0].y,
-            rightEye[0].x - leftEye[0].x
-          );
-          
-          const eyeDistance = Math.sqrt(
-            Math.pow(rightEye[0].x - leftEye[0].x, 2) +
-            Math.pow(rightEye[0].y - leftEye[0].y, 2)
-          );
-          const video = videoRef.current
+          const noseBridge = nose[0];
           const { x, y, width, height } = result.detection.box;
+          
+          // Cache rect calculation
           const rect = video.getBoundingClientRect();
-          const scaleX = rect.width / video.videoWidth;
-          const scaleY = rect.height / video.videoHeight;
-          const faceAngle = result.angle
+          const scaleX = rect.width / displaySize.width;
+          const scaleY = rect.height / displaySize.height;
+          
           const enhancedLandmarks = {
-            ...result.landmarks,
+            ...landmarks,
             imageWidth: displaySize.width,
             imageHeight: displaySize.height,
             faceBox: {
               width: width * scaleX,
               height: height * scaleY,
               x: x * scaleX,
-              y: y * scaleY
+              y: y * scaleY,
             },
             faceMetrics: {
-              eyeDistance,
-              eyeSlope,
               noseBridgeX: noseBridge.x * scaleX,
               noseBridgeY: noseBridge.y * scaleY,
-              faceDepth,
               displaySize,
-              jawX: jaw[0].x * scaleX,
-              jawY: jaw[0].y * scaleY,
               noseBridge: nose,
-              faceWidth: result.detection.box.width,
-              faceHeight: result.detection.box.height,
-              faceCenterX:
-                result.detection.box.x + result.detection.box.width / 2,
-              faceCenterY:
-                result.detection.box.y + result.detection.box.height / 2,
-                xRotation: faceAngle.pitch,
-                yRotation: faceAngle.yaw,
-                zRotation: faceAngle.roll,
+              xRotation: result.angle?.pitch || 0,
+              yRotation: result.angle?.yaw || 0,
+              zRotation: result.angle?.roll || 0,
             },
           } as Landmarks;
+
           setIsDetecting("Face detected");
           useFaceDetection.getState().setIsDetected(true);
-          if(canvasRef.current) {
-            const canvas = canvasRef.current;
-            canvas.width = displaySize.width;
-            canvas.height = displaySize.height;
-            faceapi.matchDimensions(canvas, displaySize)
-            faceapi.resizeResults(result, displaySize)
-          }
           onLandmarks(enhancedLandmarks);
-        } else {
-          useFaceDetection.getState().setIsDetected(false);
-          setIsDetecting("No face");
-        }
-      } catch (err) {
-        console.error("Detection error:", err);
-        setError("Detection error");
-      }
-      animationId = requestAnimationFrame(runDetection);
-    };
 
-    if (faceapi && openVideo) {
-      runDetection();
+          // Optimize canvas updates
+          const canvas = canvasRef.current;
+          if (canvas) {
+            if (canvas.width !== displaySize.width || canvas.height !== displaySize.height) {
+              canvas.width = displaySize.width;
+              canvas.height = displaySize.height;
+                console.log('canvas')
+              faceapi.matchDimensions(canvas, displaySize);
+              const resizedDetections = faceapi.resizeResults(result, displaySize)
+
+              faceapi.draw.drawDetections(canvas, resizedDetections)
+            }
+          }
+        }
+      } else {
+        state.noFaceCount++;
+        state.faceDetectedCount = 0;
+
+        // Only update state after consistent no-face detection
+        if (state.noFaceCount >= 3) {
+          setIsDetecting("No face");
+          useFaceDetection.getState().setIsDetected(false);
+          onLandmarks(null);
+        }
+      }
+    } catch (err) {
+      console.error("Detection error:", err);
+      setError("Detection error");
+      // Reset counters on error
+      state.faceDetectedCount = 0;
+      state.noFaceCount = 0;
+    } finally {
+      state.isDetecting = false;
     }
+  }, [faceapi, detectorOptions, onLandmarks]);
+
+  // Optimized video startup
+  const startVideo = useCallback(async () => {
+    if (!videoRef.current) return;
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 640, max: 1280 }, // Limit resolution for better performance
+          height: { ideal: 480, max: 720 },
+          frameRate: { ideal: 15, max: 30 }, // Lower frame rate
+          facingMode: "user"
+        },
+      });
+      
+      videoRef.current.srcObject = stream;
+      
+      // Wait for video to be ready before starting detection
+      videoRef.current.onloadedmetadata = () => {
+        if (faceapi && !detectionStateRef.current.animationId) {
+          detectionStateRef.current.animationId = requestAnimationFrame(runDetection);
+        }
+      };
+    } catch (error) {
+      console.error("Error accessing webcam:", error);
+      setError("Camera access denied");
+    }
+  }, [faceapi, runDetection]);
+
+  useEffect(() => {
+    if (!faceapi || isLoading) return;
+
+    startVideo();
 
     return () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
+      const state = detectionStateRef.current;
+      if (state.animationId) {
+        cancelAnimationFrame(state.animationId);
+        state.animationId = 0;
+      }
+      
+      // Cleanup video stream
+      const video = videoRef.current;
+      if (video?.srcObject) {
+        const tracks = (video.srcObject as MediaStream).getTracks();
+        tracks.forEach(track => track.stop());
       }
     };
-  }, [faceapi, openVideo, onLandmarks]);
+  }, [faceapi, isLoading, startVideo]);
+
   return (
     <div className="size-full relative">
-      
       <video
         id="video"
         ref={videoRef}
-        className="
-          object-fill
-          size-full
-          -scale-x-100
-        "
+        className="object-fill size-full -scale-x-100"
         autoPlay
         muted
         playsInline
@@ -210,12 +215,7 @@ export default function FaceDetection({
       <canvas
         ref={canvasRef}
         id="overlay"
-        className="
-          absolute inset-0 
-          object-fill
-           size-full
-           scale-x-[-1]
-        "
+        className="absolute z-[10000] bg-black/20 inset-0 object-fill size-full scale-x-[-1]"
       />
     </div>
   );
