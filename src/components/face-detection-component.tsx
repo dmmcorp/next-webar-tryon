@@ -13,7 +13,10 @@ type FaceDetectionProps = {
 };
 const FaceDetection = dynamic<FaceDetectionProps>(
   () => import("../components/face-detection"),
-  { ssr: false }
+  { ssr: false,
+    loading: () => <div className="text-white">Loading face detection...</div>,
+  }
+  
 );
 
 export default function FaceDetectionComponent() {
@@ -28,18 +31,16 @@ export default function FaceDetectionComponent() {
             orthographic 
             gl={{ antialias: false }}
             shadows={false}
-            dpr={Math.min(window.devicePixelRatio, 1.5)}
+            // dpr={Math.min(window.devicePixelRatio, 1.5)}
             camera={{ zoom: 100, position: [0, 0, 10] }}
             className="absolute  size-full scale-x-[-1] "
           >
             <ambientLight intensity={1} />
             <directionalLight position={[0, 0, 5]} />
           
-              <DynamicModel landmarks={landmarks}/>
-          
-            {isDetected && (
-              <Mask landmarks={landmarks}/>
-            )}
+             <DynamicModel landmarks={landmarks} />
+            {landmarks && isDetected && <Mask landmarks={landmarks} />}
+
           </Canvas>
         </div>
       </div>
