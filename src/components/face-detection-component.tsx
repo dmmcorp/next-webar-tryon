@@ -26,8 +26,10 @@ export default function FaceDetectionComponent() {
         <div className="absolute size-full top-0 left-0">
           <Canvas
             orthographic 
+            gl={{ antialias: false }}
+            shadows={false}
+            dpr={Math.min(window.devicePixelRatio, 1.5)}
             camera={{ zoom: 100, position: [0, 0, 10] }}
-            gl={{ antialias: true }}
             className="absolute  size-full scale-x-[-1] "
           >
             <ambientLight intensity={1} />

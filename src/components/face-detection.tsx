@@ -1,9 +1,8 @@
 "use client";
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { Landmarks, Person } from "@/lib/types";
+import { Landmarks } from "@/lib/types";
 import useFaceDetection from "@/stores/useFaceDetection";
 import { useLoadFaceApi } from "@/hooks/useLoadFaceApi";
-import { drawFaces } from "@/lib/utils";
 
 export default function FaceDetection({
   onLandmarks = () => {},

@@ -1,6 +1,5 @@
 import useFaceDetection from "@/stores/useFaceDetection";
 import { useEffect, useState } from "react";
-import * as tf from "@tensorflow/tfjs";
 
 type FaceApiModule = typeof import("@vladmandic/face-api");
 
@@ -25,9 +24,7 @@ export function useLoadFaceApi() {
         //   await tf.setBackend("webgl");
         //   await tf.ready();
         //   console.log("WebGL backend ready!");
-        // }
-
-        console.log(await tf.getBackend());
+        //
 
         const modelPath = "/models";
         await Promise.all([
