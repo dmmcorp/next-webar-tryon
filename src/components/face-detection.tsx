@@ -121,9 +121,6 @@ export default function FaceDetection({
               canvas.height = displaySize.height;
                 console.log('canvas')
               faceapi.matchDimensions(canvas, displaySize);
-              const resizedDetections = faceapi.resizeResults(result, displaySize)
-
-              faceapi.draw.drawDetections(canvas, resizedDetections)
             }
           }
         }
