@@ -37,11 +37,13 @@ export default function Mask ({landmarks}: {landmarks: Landmarks | null}){
         x: -degToRad(roll) * 1.3,
         y: -degToRad(yaw) * 0.36,
         z: degToRad(pitch) * 0.3,
+        duration: 0.1
       })
       gsap.to(modelRef.current.scale, {
         x: scaleFactor * 0.57,
         y: scaleFactor * 1.3,
         z: scaleFactor,
+        duration: 0.1
       })
 
       function screenToWorld(x: number, y: number, width: number, height: number) {
@@ -56,7 +58,8 @@ export default function Mask ({landmarks}: {landmarks: Landmarks | null}){
        gsap.to(modelRef.current.position, {
         x: nosePoint.x,
         y: nosePoint.y,
-        z: nosePoint.z
+        z: nosePoint.z,
+        duration: 0.1
       })
      }
    }
