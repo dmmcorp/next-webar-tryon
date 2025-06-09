@@ -21,11 +21,11 @@ export function useLoadFaceApi() {
 
         if (!isMounted) return;
 
-        //@ts-ignore
+        // @ts-expect-error: faceapiModule.tf may not be typed, but getBackend exists
         if (faceapiModule.tf.getBackend() !== "webgl") {
-          //@ts-ignore
+          // @ts-expect-error: faceapiModule.tf may not be typed, but setBackend exists
           await faceapiModule.tf.setBackend("webgl");
-          //@ts-ignore
+          // @ts-expect-error: faceapiModule.tf may not be typed, but ready exists
           await faceapiModule.tf.ready();
           console.log("WebGL backend ready!");
         }
