@@ -33,7 +33,7 @@ export default function GlassModel ({
       })
       gsap.to(modelRef.current.scale, {
         x: scaleFactor * 0.6,
-        y: scaleFactor * 0.75,
+        y: scaleFactor * 0.65,
         z: scaleFactor,
       })
 

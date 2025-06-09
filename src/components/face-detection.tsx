@@ -37,7 +37,7 @@ export default function FaceDetection({
         videoRef.current,
         new faceapi.TinyFaceDetectorOptions({
           inputSize: 160,
-          scoreThreshold: 0.3,
+          scoreThreshold: 0.6,
         })
       )
       .withFaceLandmarks()
