@@ -8,7 +8,7 @@ import { degToRad } from 'three/src/math/MathUtils.js'
 import gsap from 'gsap'
 
 const BASE_FACE_WIDTH = 200
-const DURATION = 0.05
+const DURATION = 0.03
 
 function screenToWorld(
   x: number,
@@ -83,7 +83,7 @@ export default function Mask({ landmarks }: { landmarks: Landmarks | null }) {
         ...targetRotation,
         duration: DURATION,
         overwrite: 'auto',
-        ease: 'power2.out',
+        ease: 'expo.out',
       })
     } else {
       Object.assign(tweensRef.current.rotation.vars, targetRotation)
@@ -96,7 +96,7 @@ export default function Mask({ landmarks }: { landmarks: Landmarks | null }) {
         ...targetScale,
         duration: DURATION,
         overwrite: 'auto',
-        ease: 'power2.out',
+        ease: 'expo.out',
       })
     } else {
       Object.assign(tweensRef.current.scale.vars, targetScale)
@@ -109,7 +109,7 @@ export default function Mask({ landmarks }: { landmarks: Landmarks | null }) {
         ...targetPosition,
         duration: DURATION,
         overwrite: 'auto',
-        ease: 'power2.out',
+        ease: 'expo.out',
       })
     } else {
       Object.assign(tweensRef.current.position.vars, targetPosition)

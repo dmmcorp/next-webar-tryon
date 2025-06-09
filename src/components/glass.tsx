@@ -67,9 +67,9 @@ export default function GlassModel({
           x: targetRotation.x,
           y: targetRotation.y,
           z: targetRotation.z,
-          duration: 0.02,
+          duration: 0.03,
           overwrite: "auto",
-          ease: "none",
+          ease: "expo.out",
         });
       } else {
         rotationTween.current.vars.x = targetRotation.x;
@@ -84,9 +84,9 @@ export default function GlassModel({
           x: targetScale.x,
           y: targetScale.y,
           z: targetScale.z,
-          duration: 0.02,
+          duration: 0.3,
           overwrite: "auto",
-          ease: "none",
+          ease: "expo.out",
         });
       } else {
         scaleTween.current.vars.x = targetScale.x;
@@ -101,9 +101,9 @@ export default function GlassModel({
           x: nosePoint.x,
           y: nosePoint.y,
           z: nosePoint.z,
-          duration: 0.02,
+          duration: 0.3,
           overwrite: "auto",
-           ease: "none",
+          ease: "expo.out",
         });
       } else {
         positionTween.current.vars.x = nosePoint.x;
