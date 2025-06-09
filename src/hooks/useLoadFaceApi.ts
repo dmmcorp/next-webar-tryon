@@ -3,21 +3,40 @@ import { useEffect, useState } from "react";
 
 type FaceApiModule = typeof import("@vladmandic/face-api");
 
+function isWebGLAvailable(): boolean {
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function useLoadFaceApi() {
   const [faceapi, setFaceapi] = useState<FaceApiModule | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [webglSupported, setWebglSupported] = useState<boolean>(true);
   const { setIsDetected } = useFaceDetection();
 
   useEffect(() => {
     let isMounted = true;
 
     async function loadLibraries() {
+      if (!isWebGLAvailable()) {
+        if (!isMounted) return;
+        setWebglSupported(false);
+        setIsLoading(false);
+        setIsDetected(false);
+        return;
+      }
+
       try {
         const [faceapiModule] = await Promise.all([
           import("@vladmandic/face-api"),
         ]);
-
-        // const wasm = await import("@tensorflow/tfjs-backend-wasm");
 
         if (!isMounted) return;
 
@@ -29,18 +48,13 @@ export function useLoadFaceApi() {
           await faceapiModule.tf.ready();
           console.log("WebGL backend ready!");
         }
+
         const modelPath = "/models";
         await Promise.all([
           faceapiModule.nets.tinyFaceDetector.loadFromUri(modelPath),
           faceapiModule.nets.faceLandmark68Net.loadFromUri(modelPath),
           faceapiModule.nets.faceRecognitionNet.loadFromUri(modelPath),
         ]);
-
-        console.log("FaceAPI nets loaded:", {
-          tinyFaceDetector: faceapiModule.nets.tinyFaceDetector.isLoaded,
-          faceLandmark68Net: faceapiModule.nets.faceLandmark68Net.isLoaded,
-          faceRecognitionNet: faceapiModule.nets.faceRecognitionNet.isLoaded,
-        });
 
         if (!isMounted) return;
 
@@ -61,5 +75,5 @@ export function useLoadFaceApi() {
     };
   }, [setIsDetected]);
 
-  return { faceapi, isLoading };
+  return { faceapi, isLoading, webglSupported };
 }

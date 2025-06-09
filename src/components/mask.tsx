@@ -40,7 +40,7 @@ export default function Mask ({landmarks}: {landmarks: Landmarks | null}){
         duration: 0.1
       })
       gsap.to(modelRef.current.scale, {
-        x: scaleFactor * 0.57,
+        x: scaleFactor * 0.6,
         y: scaleFactor * 1.3,
         z: scaleFactor,
         duration: 0.1
