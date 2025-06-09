@@ -63,8 +63,8 @@ export default function Mask({ landmarks }: { landmarks: Landmarks | null }) {
     }
 
     const targetScale = {
-      x: scaleFactor * 0.6,
-      y: scaleFactor * 1.3,
+      x: scaleFactor * 0.67,
+      y: scaleFactor * 1.1,
       z: scaleFactor,
     }
 
