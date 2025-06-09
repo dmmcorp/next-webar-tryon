@@ -13,22 +13,22 @@ export function useLoadFaceApi() {
 
     async function loadLibraries() {
       try {
-        const [faceapiModule, tfModule] = await Promise.all([
+        const [faceapiModule] = await Promise.all([
           import("@vladmandic/face-api"),
-          import("@tensorflow/tfjs"), // preload to warm up
         ]);
 
         // const wasm = await import("@tensorflow/tfjs-backend-wasm");
 
         if (!isMounted) return;
 
-        await tfModule.ready();
-        // // Set backend only if not set
-        // if (tf.getBackend() !== "webgl") {
-        //   await tf.setBackend("webgl");
-        //   await tf.ready();
-        //   console.log("WebGL backend ready!");
-
+        //@ts-ignore
+        if (faceapiModule.tf.getBackend() !== "webgl") {
+          //@ts-ignore
+          await faceapiModule.tf.setBackend("webgl");
+          //@ts-ignore
+          await faceapiModule.tf.ready();
+          console.log("WebGL backend ready!");
+        }
         const modelPath = "/models";
         await Promise.all([
           faceapiModule.nets.tinyFaceDetector.loadFromUri(modelPath),
