@@ -67,7 +67,7 @@ export default function GlassModel({
           x: targetRotation.x,
           y: targetRotation.y,
           z: targetRotation.z,
-          duration: 0.3,
+          duration: 0.05,
           overwrite: "auto",
           ease: "power2.out",
         });
@@ -84,7 +84,7 @@ export default function GlassModel({
           x: targetScale.x,
           y: targetScale.y,
           z: targetScale.z,
-          duration: 0.3,
+          duration: 0.05,
           overwrite: "auto",
           ease: "power2.out",
         });
@@ -101,7 +101,7 @@ export default function GlassModel({
           x: nosePoint.x,
           y: nosePoint.y,
           z: nosePoint.z,
-          duration: 0.3,
+          duration: 0.05,
           overwrite: "auto",
           ease: "power2.out",
         });
