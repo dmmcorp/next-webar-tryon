@@ -83,7 +83,7 @@ export default function Mask({ landmarks }: { landmarks: Landmarks | null }) {
         ...targetRotation,
         duration: DURATION,
         overwrite: 'auto',
-        ease: 'expo.out',
+        ease: "power1.out",
       })
     } else {
       Object.assign(tweensRef.current.rotation.vars, targetRotation)
@@ -96,7 +96,7 @@ export default function Mask({ landmarks }: { landmarks: Landmarks | null }) {
         ...targetScale,
         duration: DURATION,
         overwrite: 'auto',
-        ease: 'expo.out',
+        ease: "power1.out",
       })
     } else {
       Object.assign(tweensRef.current.scale.vars, targetScale)
@@ -109,7 +109,7 @@ export default function Mask({ landmarks }: { landmarks: Landmarks | null }) {
         ...targetPosition,
         duration: DURATION,
         overwrite: 'auto',
-        ease: 'expo.out',
+        ease: "power1.out",
       })
     } else {
       Object.assign(tweensRef.current.position.vars, targetPosition)
