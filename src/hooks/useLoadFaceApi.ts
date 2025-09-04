@@ -46,7 +46,6 @@ export function useLoadFaceApi() {
           await faceapiModule.tf.setBackend("webgl");
           // @ts-expect-error: faceapiModule.tf may not be typed, but ready exists
           await faceapiModule.tf.ready();
-          console.log("WebGL backend ready!");
         }
 
         const modelPath = "/models";
