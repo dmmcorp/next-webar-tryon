@@ -38,10 +38,18 @@ export type ProductsResponse = {
 
 import axios from "axios";
 
-export async function fetchProductsWithModels(signal?: AbortSignal): Promise<ProductsResponse> {
-  const res = await axios.get<ProductsResponse>(`/api/products/models`, {
-    signal,
-    headers: { "Content-Type": "application/json" },
-  });
+const SERVER_URL = "https://baobab-vision-project.onrender.com";
+
+export async function fetchProductsWithModels(
+  signal?: AbortSignal
+): Promise<ProductsResponse> {
+  const res = await axios.get<ProductsResponse>(
+    `${SERVER_URL}/api/products/models`,
+    {
+      signal,
+      headers: { Accept: "application/json" },
+      timeout: 15000,
+    }
+  );
   return res.data;
 }

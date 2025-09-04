@@ -59,9 +59,8 @@ export function useLoadFaceApi() {
 
         setFaceapi(faceapiModule);
         setIsLoading(false);
-      } catch (error) {
+      } catch {
         if (!isMounted) return;
-        console.error("Error loading libraries:", error);
         setIsLoading(false);
         setIsDetected(false);
       }
