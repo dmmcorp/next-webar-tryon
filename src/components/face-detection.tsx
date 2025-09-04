@@ -122,8 +122,7 @@ export default function FaceDetection({
           useFaceDetection.getState().setIsDetected(false);
           setIsDetecting("No face");
         }
-      } catch (err) {
-        console.error("Detection error:", err);
+      } catch {
         setError("Detection error");
       }
       animationId = requestAnimationFrame(runDetection);
@@ -147,8 +146,8 @@ export default function FaceDetection({
           video: true,
         });
         videoRef.current.srcObject = stream;
-      } catch (error) {
-        console.error("Error accessing webcam:", error);
+      } catch {
+        // ignore webcam access error silently
       }
     }
   };

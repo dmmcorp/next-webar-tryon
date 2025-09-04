@@ -16,6 +16,7 @@
     "@tensorflow/tfjs-backend-wasm": "^4.22.0",
     "@types/three": "^0.176.0",
     "@vladmandic/face-api": "^1.7.15",
+    "axios": "^1.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",

@@ -62,7 +62,6 @@ export function drawFaces(
 }
 
 export function log(...txt: unknown[]): void {
-  console.log(...txt);
   const div = document.getElementById("log");
   if (div) div.innerHTML += `<br>${txt}`;
 }
