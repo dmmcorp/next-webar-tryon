@@ -11,6 +11,9 @@ import {
 import useProducts from "@/hooks/useProducts";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
+import type { StaticImageData } from "next/image";
+
+type ModelCard = { name: string; image?: string | StaticImageData };
 
 export default function ModelSelector() {
   const { selectedModel, selectModel } = useModelStore();
@@ -27,7 +30,9 @@ export default function ModelSelector() {
     setModel(null);
     selectModel(null);
   };
-  const modelCards = models?.length ? models : staticModels;
+  const modelCards: ModelCard[] = (
+    models?.length ? models : staticModels
+  ) as ModelCard[];
   const availableVariants = variants?.length ? variants : staticVariants;
   const filteredVariants = availableVariants.filter(
     (variant) => variant.model === model
@@ -67,7 +72,7 @@ export default function ModelSelector() {
                     onClick={() => handleSelectModel(model.name)}
                   >
                     <Image
-                      src={(model as any).image || "/placeholder.svg"}
+                      src={model.image ?? "/placeholder.svg"}
                       alt={model.name}
                       fill
                       className="object-cover hover:scale-110 transition-transform duration-300"
