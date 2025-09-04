@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
         { status: 502 }
       );
     }
-    const bytes = Buffer.from(resp.data as any);
+    const bytes = Buffer.from(resp.data);
     return new NextResponse(bytes, {
       status: 200,
       headers: {
