@@ -38,8 +38,7 @@ export type ProductsResponse = {
 
 import axios, { AxiosError } from "axios";
 
-// const SERVER_URL = "https://baobab-vision-project-0234.onrender.com";
-const SERVER_URL = "http://localhost:3001";
+const SERVER_URL = "https://baobab-vision-project-0234.onrender.com";
 const MAX_RETRIES = 3;
 const TIMEOUT = 30000; // 30 seconds for better reliability
 
