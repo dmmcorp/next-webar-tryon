@@ -38,7 +38,7 @@ export type ProductsResponse = {
 
 import axios from "axios";
 
-const SERVER_URL = "https://baobab-vision-project-peox.onrender.com";
+const SERVER_URL = "https://baobab-vision-project-0234.onrender.com";
 
 export async function fetchProductsWithModels(
   signal?: AbortSignal
